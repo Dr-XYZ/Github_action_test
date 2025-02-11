@@ -13,68 +13,56 @@ HEADERS = {
     "Accept": "application/vnd.github.v3+json",
     "Authorization": f"token {os.getenv('GITHUB_TOKEN')}",
 }
-
-def get_file_list(repo, path):
-    """使用 GitHub API 取得指定目錄下的檔案列表"""
-    url = f"{GITHUB_API}/{repo}/contents/{path}"
-    print(url)
+    
+def get_trans_file(url):
     try:
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
-        print(response.json())
-        return [file["name"] for file in response.json() if file["type"] == "file" and file["name"].endswith(".md")]
     except requests.RequestException as e:
         print(f"Error fetching file list from {repo} at {path}: {e}")
-    return []
+    for i in response.json():
+        if i.type == 'dir':
+            get_trans_file(i.url)
+        else:
+            get_file_content(i.download_url)
 
-# def get_file_content(repo, path):
-#     """使用 GitHub API 取得檔案內容"""
-#     url = f"{GITHUB_API}/{repo}/contents/{path}"
-#     try:
-#         response = requests.get(url, headers=HEADERS)
-#         response.raise_for_status()
-#         download_url = response.json().get("download_url")
-#         if download_url:
-#             return requests.get(download_url).text
-#     except requests.RequestException as e:
-#         print(f"Error fetching file content from {repo} at {path}: {e}")
-#     return None
+def get_file_content(url):
+    """使用 GitHub API 取得檔案內容"""
+    try:
+        response = requests.get(url, headers=HEADERS)
+        response.raise_for_status()
+        download_url = response.json().get("download_url")
+        if download_url:
+            return requests.get(download_url).text
+    except requests.RequestException as e:
+        print(f"Error fetching file content from {repo} at {path}: {e}")
+    return None
 
-# def get_latest_commit(repo, path):
-#     """使用 GitHub API 取得檔案的最新 commit"""
-#     url = f"{GITHUB_API}/{repo}/commits?path={path}&per_page=1"
-#     try:
-#         response = requests.get(url, headers=HEADERS)
-#         response.raise_for_status()
-#         commits = response.json()
-#         if commits:
-#             return commits[0]["sha"]
-#     except requests.RequestException as e:
-#         print(f"Error fetching latest commit for {path} in {repo}: {e}")
-#     return None
+def get_mdn_content_latest_commit(repo, path):
+    pass
 
-# def get_yaml_metadata(content):
-#     """解析 YAML metadata"""
-#     if content.startswith("---"):
-#         try:
-#             yaml_content = content.split("---")[1]
-#             return yaml.safe_load(yaml_content) or {}
-#         except yaml.YAMLError as e:
-#             print(f"YAML 解析錯誤: {e}")
-#     return {}
+def get_yaml_metadata(content):
+    """解析 YAML metadata"""
+    if content.startswith("---"):
+        try:
+            yaml_content = content.split("---")[1]
+            return yaml.safe_load(yaml_content) or {}
+        except yaml.YAMLError as e:
+            print(f"YAML 解析錯誤: {e}")
+    return {}
 
 def main():
     # outdated_files = set()  # 使用 set 去重
     print("開始獲取翻譯檔案列表...")
     
 #     # 取得所有翻譯檔案
-    translated_files = get_file_list(TRANSLATED_REPO, TRANSLATED_PATH)
-    if not translated_files:
-        print("未找到任何翻譯檔案。")
+    # translated_file_list = get_file_list(TRANSLATED_REPO, TRANSLATED_PATH)
+    file_list = get_trans_file(https://api.github.com/repos/mdn/translated-content/contents/files/zh-tw)
     
-#     for file_name in translated_files:
-#         translated_file_path = f"{TRANSLATED_PATH}/{file_name}"
-#         original_file_path = f"{CONTENT_PATH}/{file_name}"
+    
+    for file_name in translated_files:
+        translated_file_path = f"{TRANSLATED_PATH}/{file_name}"
+        original_file_path = f"{CONTENT_PATH}/{file_name}"
 
 #         # 取得翻譯檔案內容
 #         translated_content = get_file_content(TRANSLATED_REPO, translated_file_path)
