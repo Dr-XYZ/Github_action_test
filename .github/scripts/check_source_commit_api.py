@@ -21,7 +21,7 @@ def get_file_list(repo, path):
     try:
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
-        print(response.raise_for_status())
+        print(response.json())
         return [file["name"] for file in response.json() if file["type"] == "file" and file["name"].endswith(".md")]
     except requests.RequestException as e:
         print(f"Error fetching file list from {repo} at {path}: {e}")
