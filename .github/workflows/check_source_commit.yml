@@ -25,7 +25,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "開始執行檢查過時翻譯檔案"
+          echo "hiiiii"
           python .github/scripts/check_source_commit_api.py
 
       - name: Check git status
