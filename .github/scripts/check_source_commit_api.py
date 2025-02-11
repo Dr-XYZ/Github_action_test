@@ -17,6 +17,7 @@ HEADERS = {
 def get_file_list(repo, path):
     """使用 GitHub API 取得指定目錄下的檔案列表"""
     url = f"{GITHUB_API}/{repo}/contents/{path}"
+    print(url)
     try:
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
