@@ -17,33 +17,38 @@ HEADERS = {
 def get_file_list(repo, path):
     """使用 GitHub API 取得指定目錄下的檔案列表"""
     url = f"{GITHUB_API}/{repo}/contents/{path}"
-    response = requests.get(url, headers=HEADERS)
-    
-    if response.status_code == 200:
+    try:
+        response = requests.get(url, headers=HEADERS)
+        response.raise_for_status()
         return [file["name"] for file in response.json() if file["type"] == "file" and file["name"].endswith(".md")]
-    print(f"Error fetching file list: {response.status_code}")
+    except requests.RequestException as e:
+        print(f"Error fetching file list from {repo} at {path}: {e}")
     return []
 
 def get_file_content(repo, path):
     """使用 GitHub API 取得檔案內容"""
     url = f"{GITHUB_API}/{repo}/contents/{path}"
-    response = requests.get(url, headers=HEADERS)
-    
-    if response.status_code == 200:
+    try:
+        response = requests.get(url, headers=HEADERS)
+        response.raise_for_status()
         download_url = response.json().get("download_url")
         if download_url:
             return requests.get(download_url).text
-    print(f"Error fetching file content for {path}: {response.status_code}")
+    except requests.RequestException as e:
+        print(f"Error fetching file content from {repo} at {path}: {e}")
     return None
 
 def get_latest_commit(repo, path):
     """使用 GitHub API 取得檔案的最新 commit"""
     url = f"{GITHUB_API}/{repo}/commits?path={path}&per_page=1"
-    response = requests.get(url, headers=HEADERS)
-    
-    if response.status_code == 200 and response.json():
-        return response.json()[0]["sha"]
-    print(f"Error fetching latest commit for {path}: {response.status_code}")
+    try:
+        response = requests.get(url, headers=HEADERS)
+        response.raise_for_status()
+        commits = response.json()
+        if commits:
+            return commits[0]["sha"]
+    except requests.RequestException as e:
+        print(f"Error fetching latest commit for {path} in {repo}: {e}")
     return None
 
 def get_yaml_metadata(content):
@@ -59,9 +64,9 @@ def get_yaml_metadata(content):
 def main():
     outdated_files = set()  # 使用 set 去重
     print("開始獲取翻譯檔案列表...")
+    
     # 取得所有翻譯檔案
     translated_files = get_file_list(TRANSLATED_REPO, TRANSLATED_PATH)
-
     if not translated_files:
         print("未找到任何翻譯檔案。")
     
