@@ -1,3 +1,29 @@
+import os
+import requests
+import yaml
+
+TRANSLATED_REPO = "mdn/translated-content"
+CONTENT_REPO = "mdn/content"
+TRANSLATED_PATH = "files/zh-tw"
+CONTENT_PATH = "files/en-us"
+README_FILE = "README.md"
+
+GITHUB_API = "https://api.github.com/repos"
+HEADERS = {
+    "Accept": "application/vnd.github.v3+json",
+    "Authorization": f"token {os.getenv('GITHUB_TOKEN')}",
+}
+
+def get_file_list(repo, path):
+    """使用 GitHub API 取得指定目錄下的檔案列表"""
+    url = f"{GITHUB_API}/{repo}/contents/{path}"
+    response = requests.get(url, headers=HEADERS)
+    
+    if response.status_code == 200:
+        return [file["name"] for file in response.json() if file["type"] == "file" and file["name"].endswith(".md")]
+    print(f"Error fetching file list: {response.status_code}")
+    return []
+
 def get_file_content(repo, path):
     """使用 GitHub API 取得檔案內容"""
     url = f"{GITHUB_API}/{repo}/contents/{path}"
@@ -7,6 +33,17 @@ def get_file_content(repo, path):
         download_url = response.json().get("download_url")
         if download_url:
             return requests.get(download_url).text
+    print(f"Error fetching file content for {path}: {response.status_code}")
+    return None
+
+def get_latest_commit(repo, path):
+    """使用 GitHub API 取得檔案的最新 commit"""
+    url = f"{GITHUB_API}/{repo}/commits?path={path}&per_page=1"
+    response = requests.get(url, headers=HEADERS)
+    
+    if response.status_code == 200 and response.json():
+        return response.json()[0]["sha"]
+    print(f"Error fetching latest commit for {path}: {response.status_code}")
     return None
 
 def get_yaml_metadata(content):
@@ -21,10 +58,13 @@ def get_yaml_metadata(content):
 
 def main():
     outdated_files = set()  # 使用 set 去重
-
+    print("開始獲取翻譯檔案列表...")
     # 取得所有翻譯檔案
     translated_files = get_file_list(TRANSLATED_REPO, TRANSLATED_PATH)
 
+    if not translated_files:
+        print("未找到任何翻譯檔案。")
+    
     for file_name in translated_files:
         translated_file_path = f"{TRANSLATED_PATH}/{file_name}"
         original_file_path = f"{CONTENT_PATH}/{file_name}"
@@ -45,7 +85,13 @@ def main():
 
     # 更新 README.md
     if outdated_files:
+        print(f"發現 {len(outdated_files)} 個過時的翻譯檔案，開始更新 README.md...")
         with open(README_FILE, "w", encoding="utf-8") as f:
             f.write("# Outdated Translations\n\n")
             f.write("以下文件的 `sourceCommit` 不是最新的，請更新翻譯：\n\n")
             f.write("\n".join(outdated_files) + "\n")
+    else:
+        print("未發現過時的翻譯檔案。")
+
+if __name__ == "__main__":
+    main()
