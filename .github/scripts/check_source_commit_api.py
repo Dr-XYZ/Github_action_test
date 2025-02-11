@@ -31,6 +31,7 @@ def get_file_list(repo, base_path, relative_path=""):
     """
     full_path = join_path(base_path, relative_path) if relative_path else base_path
     url = f"{GITHUB_API}/{repo}/contents/{full_path}"
+    print(url)
     try:
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
