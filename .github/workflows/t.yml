@@ -34,12 +34,6 @@ jobs:
           echo "p1=$(cat p1.txt)" >> $GITHUB_ENV
           echo "p2=$(cat p2.txt)" >> $GITHUB_ENV
 
-      - name: List Available Gemini Models
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          curl -s -X GET "https://generativelanguage.googleapis.com/v1beta/models?key=${{ secrets.GEMINI_API_KEY }}" | jq .
-
       - name: Process and Send to Gemini 2.0 Flash
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
