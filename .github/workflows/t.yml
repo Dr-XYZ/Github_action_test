@@ -17,7 +17,7 @@ jobs:
       - name: Read path list from README.md
         id: read_paths
         run: |
-          paths=$(awk 'NF && $1 !~ /^#/' README.md)
+          paths=$(awk 'NF && $1 !~ /^#/ && !/\./' README.md)
           echo "PATHS=$paths" >> $GITHUB_ENV
 
       - name: Checkout MDN Content
@@ -46,7 +46,7 @@ jobs:
 
           # Initialize GenAI client
           genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-          model = genai.GenerativeModel('gemini-1.0-pro-flash') #changed to gemini-1.0-pro-flash because gemini-2.0-flash is not available
+          model = genai.GenerativeModel('gemini-1.0-pro-flash')
 
           # Read the paths from the environment variable
           paths = os.getenv("PATHS").splitlines()
