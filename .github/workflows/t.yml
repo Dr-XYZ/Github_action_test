@@ -10,43 +10,62 @@ jobs:
   update-files:
     runs-on: ubuntu-latest
     steps:
-      # 1. 取得當前 repository 程式碼
+      # 1. Checkout current repository (包含 readme.md/README.md、p1.md、p2.md)
       - name: Checkout current repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # 確保完整歷史，避免 push 失敗
-          persist-credentials: false  # 避免影響 GitHub Actions 推送權限
 
-      # 2. 設定 Git 使用者資訊
-      - name: Setup Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      # 3. 列出 repository 根目錄所有檔案
+      # 列出 repository 根目錄所有檔案，方便確認檔案名稱與位置
       - name: List repository files
         run: ls -la
 
-      # 4. Checkout 另一個 repository (mdn/content) 至子目錄 mdn-content 下
+      # 輸出 input 檔案內容供除錯確認，並檢查 readme 檔案的大小寫問題
+      - name: Show input files
+        run: |
+          if [ -f "readme.md" ]; then
+            echo "==== readme.md content ===="
+            cat readme.md
+          elif [ -f "README.md" ]; then
+            echo "==== README.md content ===="
+            cat README.md
+          else
+            echo "readme.md 或 README.md 均不存在"
+          fi
+
+          echo "==== p1.md content ===="
+          if [ -f "p1.md" ]; then
+            cat p1.md
+          else
+            echo "p1.md not found"
+          fi
+
+          echo "==== p2.md content ===="
+          if [ -f "p2.md" ]; then
+            cat p2.md
+          else
+            echo "p2.md not found"
+          fi
+
+      # 2. Checkout mdn/content repository 至子目錄 mdn-content 下 (僅用於讀取，不修改)
       - name: Checkout mdn/content repository
         uses: actions/checkout@v3
         with:
           repository: mdn/content
           path: mdn-content
-          persist-credentials: false  # 這裡不儲存憑證，避免影響主 repo 的推送
 
-      # 5. 設定 Python 環境
+      # 3. 設定 Python 環境
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      # 6. 安裝 google-genai 相依套件
+      # 4. 安裝 google-genai 相依套件
       - name: Install google-genai dependency
         run: |
           pip install -q -U google-genai
 
-      # 7. 執行 Python 腳本
+      # 5. 執行 Python 腳本：讀取 p1.md、p2.md 與 readme（支援 readme.md 或 README.md）中列出的路徑，
+      #    從 mdn-content 中取得檔案內容，組合 prompt 後呼叫 Gemini API，
+      #    最後將回應內容寫入當前 repository 的新檔案 (例如 output/ 資料夾)
       - name: Process files with Gemini API using Python
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -55,6 +74,7 @@ jobs:
           import os
           from google import genai
 
+          # 定義讀取檔案函式，若檔案不存在則回傳空字串
           def read_file(filename):
               if os.path.exists(filename):
                   with open(filename, "r", encoding="utf-8") as f:
@@ -63,9 +83,11 @@ jobs:
                   print(f"警告：{filename} 不存在。")
                   return ""
 
+          # 讀取 p1.md 與 p2.md 的內容
           p1 = read_file("p1.md")
           p2 = read_file("p2.md")
-
+          
+          # 檢查 readme 檔案名稱，支援 readme.md 與 README.md
           if os.path.exists("readme.md"):
               readme_file = "readme.md"
           elif os.path.exists("README.md"):
@@ -73,20 +95,26 @@ jobs:
           else:
               print("錯誤：readme.md 或 README.md 均不存在。")
               exit(1)
-
+          
           try:
               with open(readme_file, "r", encoding="utf-8") as f:
                   paths = [line.strip() for line in f if line.strip()]
           except Exception as e:
               print(f"讀取 {readme_file} 時發生錯誤: {e}")
               exit(1)
-
+          
+          # 初始化 Google GenAI 客戶端
           try:
               client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
           except Exception as e:
               print(f"初始化 genai client 發生錯誤: {e}")
               exit(1)
-
+          
+          # 建立 output 資料夾儲存結果
+          output_dir = "output"
+          os.makedirs(output_dir, exist_ok=True)
+          
+          # 逐一處理 readme 中列出的每個檔案路徑
           for file_path in paths:
               full_path = os.path.join("mdn-content", file_path)
               if os.path.exists(full_path):
@@ -95,10 +123,10 @@ jobs:
               else:
                   print(f"警告：{full_path} 不存在，使用空內容")
                   file_content = ""
-
+              
               prompt = f"{p1}\n{file_content}\n{p2}"
               print(f"處理檔案: {file_path}")
-
+              
               try:
                   response = client.models.generate_content(
                       model="gemini-2.0-flash",
@@ -107,24 +135,27 @@ jobs:
               except Exception as e:
                   print(f"呼叫 API 時發生錯誤 ({file_path}): {e}")
                   continue
-
+              
               result = response.text
-              print(f"取得 {file_path} API 回應成功，寫入結果...")
-
+              output_file = os.path.join(output_dir, os.path.basename(file_path))
+              print(f"取得 {file_path} API 回應成功，寫入 {output_file}...")
+              
               try:
-                  with open(full_path, "w", encoding="utf-8") as f:
+                  with open(output_file, "w", encoding="utf-8") as f:
                       f.write(result)
               except Exception as e:
-                  print(f"寫入 {full_path} 時發生錯誤: {e}")
+                  print(f"寫入 {output_file} 時發生錯誤: {e}")
           EOF
 
-      # 8. **回到自己的 repo，檢查並提交變更**
-      - name: Commit and push changes to original repository
+      # 6. 檢查並提交變更至自己的 repository（若有變更則 commit 並 push）
+      - name: Commit and push changes to own repository
         run: |
-          git add .
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add output/
           if ! git diff-index --quiet HEAD; then
-            git commit -m "Update files via Gemini API using google-genai"
-            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+            git commit -m "Update output files via Gemini API"
+            git push
           else
             echo "沒有變更需要提交。"
           fi
