@@ -34,6 +34,12 @@ jobs:
           echo "p1=$(cat p1.txt)" >> $GITHUB_ENV
           echo "p2=$(cat p2.txt)" >> $GITHUB_ENV
 
+      - name: List Available Gemini Models
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          curl -s -X GET "https://generativelanguage.googleapis.com/v1beta/models?key=${{ secrets.GEMINI_API_KEY }}" | jq .
+
       - name: Process and Send to Gemini 2.0 Flash
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -49,19 +55,16 @@ jobs:
               echo "Prompt for ${path}/index.md:"
               echo "$prompt"
 
-              # 發送 API 請求
               json_payload=$(jq -n --arg prompt "$prompt" '{contents: [{parts: [{text: $prompt}]}]}')
               response=$(curl -s -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-flash:generateContent?key=${{ secrets.GEMINI_API_KEY }}" \
                 -H "Content-Type: application/json" \
                 -d "$json_payload")
 
-              # 檢查 API 返回的錯誤
               if [[ $(echo "$response" | jq -r '.error') != "null" ]]; then
                 echo "API Error for ${path}/index.md: $(echo "$response" | jq -r '.error.message')"
                 continue
               fi
 
-              # 提取 API 回傳的文本
               extracted_text=$(echo "$response" | jq -r '.candidates[0].content.parts[0].text')
 
               if [[ -z "$extracted_text" ]]; then
@@ -73,11 +76,10 @@ jobs:
               echo "API Response for ${path}/index.md:"
               echo "$extracted_text"
 
-              # 確保目錄存在，並將結果寫入文件
               mkdir -p "$(dirname "$output_file")"
               echo "$extracted_text" > "$output_file"
 
-              sleep 2  # 每次 API 請求後等待 2 秒
+              sleep 2
             else
               echo "File $mdn_file not found, skipping."
             fi
