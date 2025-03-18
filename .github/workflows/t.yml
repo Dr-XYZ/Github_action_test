@@ -30,6 +30,7 @@ jobs:
           p1_file="original-repo/p1.md"
           p2_file="original-repo/p2.md"
 
+          # 檢查 p1.md 和 p2.md 是否存在並讀取內容
           if [ -f "$p1_file" ]; then
             p1_content=$(cat "$p1_file")
           else
@@ -42,14 +43,14 @@ jobs:
             p2_content=""
           fi
 
-          # 使用 EOF 避免 shell 解析錯誤
+          # 使用 jq 將內容進行 JSON 編碼，避免特殊字符問題
+          p1_content_escaped=$(printf '%s' "$p1_content" | jq -Rs .)
+          p2_content_escaped=$(printf '%s' "$p2_content" | jq -Rs .)
+
+          # 輸出 p1 和 p2 的內容
           {
-            echo "p1<<EOF"
-            echo "$p1_content"
-            echo "EOF"
-            echo "p2<<EOF"
-            echo "$p2_content"
-            echo "EOF"
+            echo "p1=$p1_content_escaped"
+            echo "p2=$p2_content_escaped"
           } >> "$GITHUB_OUTPUT"
 
       # Step 3: Read and process README paths from original repo
