@@ -10,44 +10,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # First checkout: Original repository to get p1.md and p2.md
+      # Step 0: Checkout original repository
       - name: Checkout original repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: original-repo
+
+      # Step 1: Checkout mdn/content repository
+      - name: Checkout mdn/content
+        uses: actions/checkout@v4
+        with:
+          repository: mdn/content
+          path: mdn-content
 
       # Step 2: Read p1.md and p2.md from original repository
       - name: Read p1 and p2 content
         id: get-content
         run: |
-          # Check if files exist in original-repo, use default content if not found
+          # 檢查檔案是否存在
           if [ -f original-repo/p1.md ]; then
             p1_content=$(cat original-repo/p1.md)
           else
-            echo "Error: p1.md not found in original repository"
-            exit 1
+            p1_content=""
           fi
 
           if [ -f original-repo/p2.md ]; then
             p2_content=$(cat original-repo/p2.md)
           else
-            echo "Error: p2.md not found in original repository"
-            exit 1
+            p2_content=""
           fi
 
           # Escape newlines for GitHub output
-          echo "p1=$(echo "$p1_content" | jq -Rs @json)" >> $GITHUB_OUTPUT
-          echo "p2=$(echo "$p2_content" | jq -Rs @json)" >> $GITHUB_OUTPUT
-        working-directory: original-repo
+          echo "p1=$(jq -Rs <<< "$p1_content")" >> $GITHUB_OUTPUT
+          echo "p2=$(jq -Rs <<< "$p2_content")" >> $GITHUB_OUTPUT
 
-      # Step 0: Checkout mdn/content repository
-      - name: Checkout mdn/content
-        uses: actions/checkout@v3
-        with:
-          repository: mdn/content
-          path: mdn-content
-
-      # Step 1: Read and process README paths from original repo
+      # Step 3: Read and process README paths from original repo
       - name: Read and process README paths
         id: get-paths
         run: |
@@ -55,46 +52,41 @@ jobs:
             echo "Error: README.md not found in original repository"
             exit 1
           fi
-          paths=$(cat original-repo/README.md | sed 's|$|/index.md|' | tr '\n' ' ')
+          paths=$(sed 's|$|/index.md|' original-repo/README.md | tr '\n' ' ')
           echo "paths=$paths" >> $GITHUB_OUTPUT
-        working-directory: original-repo
 
-      # Step 3 & 4: Process with Gemini API and save results in original repo
+      # Step 4: Process with Gemini API and save results in original repo
       - name: Process with Gemini API
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           IFS=' ' read -r -a path_array <<< "${{ steps.get-paths.outputs.paths }}"
-          p1=$(echo "${{ steps.get-content.outputs.p1 }}" | jq -r .)
-          p2=$(echo "${{ steps.get-content.outputs.p2 }}" | jq -r .)
+          p1=$(jq -r . <<< "${{ steps.get-content.outputs.p1 }}")
+          p2=$(jq -r . <<< "${{ steps.get-content.outputs.p2 }}")
 
           for path in "${path_array[@]}"; do
-            # Check if content file exists in mdn-content
-            if [ -f "mdn-content/$path" ]; then
-              content=$(cat "mdn-content/$path" | jq -Rs @json)
-              content=$(echo "$content" | jq -r .)
-            else
-              echo "Warning: Content file not found for $path in mdn-content, using empty string"
-              content=""
+            content=""
+            mdn_path="mdn-content/$path"
+
+            # 檢查 mdn-content 是否有對應檔案
+            if [ -f "$mdn_path" ]; then
+              content=$(jq -Rs < "$mdn_path")
             fi
 
-            # Make API call
+            # 呼叫 Gemini API
             response=$(curl -s -X POST "https://api.gemini.com/v1/process" \
               -H "Authorization: Bearer $GEMINI_API_KEY" \
               -H "Content-Type: application/json" \
               -d "{\"input\": \"$p1$content$p2\"}")
 
-            # Create directory if it doesn't exist in original-repo
+            # 建立目錄並儲存回應
             mkdir -p "original-repo/$(dirname "$path")"
-
-            # Save response
             echo "$response" > "original-repo/$path"
 
-            # Wait 2 seconds
             sleep 2
           done
 
-      # Commit and push results to original repository
+      # Step 5: Commit and push results to original repository
       - name: Commit results
         run: |
           cd original-repo
