@@ -36,24 +36,26 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          for path in $paths; do
-            mdn_file="mdn_content/$path"
-            output_file="$path"
+for path in $paths; do
+  mdn_file="mdn_content/$path"
+  output_file="$path"
 
-            if [ -f "$mdn_file" ]; then
-              content=$(cat "$mdn_file")
-              prompt="${{ env.p1 }}\n$content\n${{ env.p2 }}"
+  if [ -f "$mdn_file" ]; then
+    content=$(cat "$mdn_file")
+    prompt="${{ env.p1 }}\n$content\n${{ env.p2 }}"
 
-              response=$(curl -X POST "https://api.gemini.com/v1/generate" \
-                -H "Authorization: Bearer $GEMINI_API_KEY" \
-                -H "Content-Type: application/json" \
-                -d "{\"prompt\": \"$prompt\"}" | jq -r '.text')
+    response=$(curl -X POST "https://api.gemini.com/v1/generate" \
+      -H "Authorization: Bearer $GEMINI_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d "{\"prompt\": \"$prompt\"}" | jq -r '.text')
 
-              echo "$response" > "$output_file"
-            else
-              echo "File $mdn_file not found, skipping."
-            fi
-          done
+    echo "$response" > "$output_file"
+
+    sleep 2  # **每次 API 請求後等待 2 秒**
+  else
+    echo "File $mdn_file not found, skipping."
+  fi
+done
 
       - name: Commit and Push Changes
         run: |
