@@ -1,95 +1,84 @@
-name: Process MDN Files with Gemini 2.0 Flash
+name: Process MDN Content with Gemini API
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  process-mdn:
+  process-content:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Read path list from README.md
-        id: read_paths
-        run: |
-          paths=$(awk 'NF && $1 !~ /^#/ && !/\./' README.md)
-          echo "PATHS=$paths" >> $GITHUB_ENV
-
-      - name: Checkout MDN Content
-        uses: actions/checkout@v4
+      # Step 0: Checkout mdn/content repository
+      - name: Checkout mdn/content
+        uses: actions/checkout@v3
         with:
           repository: mdn/content
-          path: mdn_content
+          path: mdn-content
 
-      - name: Read Prompt Files
-        id: read_prompts
+      # Step 1: Checkout this repository and read README.md
+      - name: Checkout this repository
+        uses: actions/checkout@v3
+        with:
+          path: this-repo
+
+      - name: Read and process README paths
+        id: get-paths
         run: |
-          echo "P1=$(cat p1.txt)" >> $GITHUB_ENV
-          echo "P2=$(cat p2.txt)" >> $GITHUB_ENV
+          # Read README.md and process paths
+          paths=$(cat this-repo/README.md | sed 's|$|/index.md|' | tr '\n' ' ')
+          echo "paths=$paths" >> $GITHUB_OUTPUT
+        working-directory: this-repo
 
-      - name: Install Google GenAI Client
+      # Step 2: Read p1.md and p2.md
+      - name: Read p1 and p2 content
+        id: get-content
         run: |
-          python -m pip install --upgrade google-generativeai
+          p1_content=$(cat this-repo/p1.md)
+          p2_content=$(cat this-repo/p2.md)
+          # Escape newlines for GitHub output
+          echo "p1=$(echo "$p1_content" | tr '\n' '\\n')" >> $GITHUB_OUTPUT
+          echo "p2=$(echo "$p2_content" | tr '\n' '\\n')" >> $GITHUB_OUTPUT
+        working-directory: this-repo
 
-      - name: Process and Send to Gemini 2.0 Flash using Python Client
+      # Step 3 & 4: Process each path with Gemini API and save results
+      - name: Process with Gemini API
         env:
-          GOOGLE_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          import os
-          import google.generativeai as genai
-          import time
+          IFS=' ' read -r -a path_array <<< "${{ steps.get-paths.outputs.paths }}"
+          p1="${{ steps.get-content.outputs.p1 }}"
+          p2="${{ steps.get-content.outputs.p2 }}"
+          
+          for path in "${path_array[@]}"; do
+            # Read content from mdn-content
+            content=$(cat "mdn-content/$path" | tr '\n' '\\n')
+            
+            # Make API call (replace with actual Gemini API endpoint)
+            response=$(curl -s -X POST "https://api.gemini.com/v1/process" \
+              -H "Authorization: Bearer $GEMINI_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d "{\"input\": \"$p1$content$p2\"}")
+            
+            # Create directory if it doesn't exist
+            mkdir -p "this-repo/$(dirname "$path")"
+            
+            # Save response
+            echo "$response" > "this-repo/$path"
+            
+            # Wait 2 seconds
+            sleep 2
+          done
 
-          # Initialize GenAI client
-          genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-          model = genai.GenerativeModel('gemini-1.0-pro-flash')
-
-          # Read the paths from the environment variable
-          paths = os.getenv("PATHS").splitlines()
-
-          for path in paths:
-              mdn_file = f"mdn_content/{path}/index.md"
-              output_file = f"{path}/index.md"
-
-              if os.path.exists(mdn_file):
-                  with open(mdn_file, "r") as file:
-                      content = file.read()
-
-                  prompt = f"{os.getenv('P1')}\n{content}\n{os.getenv('P2')}"
-                  print(f"Prompt for {path}/index.md:\n{prompt}")
-
-                  # Send the prompt to the Gemini 2.0 API
-                  try:
-                    response = model.generate_content(prompt)
-                    extracted_text = response.text
-                  except Exception as e:
-                    print(f"Error processing {path}/index.md: {e}")
-                    continue
-
-                  if not extracted_text:
-                      print(f"No text extracted from API response for {path}/index.md")
-                      continue
-
-                  print(f"API Response for {path}/index.md:\n{extracted_text}")
-
-                  # Write the extracted text to the output file
-                  os.makedirs(os.path.dirname(output_file), exist_ok=True)
-                  with open(output_file, "w") as output:
-                      output.write(extracted_text)
-
-                  # Sleep to avoid overloading the API
-                  time.sleep(2)
-              else:
-                  print(f"File {mdn_file} not found, skipping.")
-      
-      - name: Commit and Push Changes
+      # Commit and push results
+      - name: Commit results
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
+          cd this-repo
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
           git add .
-          git commit -m "Update processed files from MDN Content with Gemini 1.0 Pro Flash" || true
+          git commit -m "Update processed content"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
