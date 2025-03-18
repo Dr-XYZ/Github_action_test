@@ -52,7 +52,8 @@ jobs:
                 -H "Content-Type: application/json" \
                 -d "$json_payload" | jq -r '.candidates[0].content.parts[0].text')
 
-              # 儲存結果到文件並輸出到 terminal
+              # 創建目錄並儲存結果到文件
+              mkdir -p "$(dirname "$output_file")"  # 創建必要的目錄結構
               echo "Generated content for ${path}/index.md:"  # 顯示在 terminal 中
               echo "$response"
               echo "$response" > "$output_file"
