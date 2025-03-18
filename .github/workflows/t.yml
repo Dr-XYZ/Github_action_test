@@ -61,7 +61,7 @@ jobs:
       # 4. 安裝 google-genai 相依套件
       - name: Install google-genai dependency
         run: |
-          pip install -q -U google-genai
+          pip install -q -U google-generativeai
 
       # 5. 執行 Python 腳本：讀取 p1.md、p2.md 與 readme（支援 readme.md 或 README.md）中列出的路徑，
       #    從 mdn-content 中取得檔案內容，組合 prompt 後呼叫 Gemini API，
@@ -72,7 +72,7 @@ jobs:
         run: |
           python - << 'EOF'
           import os
-          from google import genai
+          import google.generativeai as genai
 
           # 定義讀取檔案函式，若檔案不存在則回傳空字串
           def read_file(filename):
@@ -105,7 +105,7 @@ jobs:
           
           # 初始化 Google GenAI 客戶端
           try:
-              client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+              genai.configure(api_key=os.environ["GEMINI_API_KEY"])
           except Exception as e:
               print(f"初始化 genai client 發生錯誤: {e}")
               exit(1)
@@ -128,17 +128,17 @@ jobs:
               print(f"處理檔案: {file_path}")
               
               try:
-                  response = client.models.generate_content(
-                      model="gemini-2.0-flash",
-                      contents=prompt
-                  )
+                  model = genai.GenerativeModel('gemini-pro')
+                  response = model.generate_content(prompt)
+                  result = response.text
               except Exception as e:
                   print(f"呼叫 API 時發生錯誤 ({file_path}): {e}")
-                  continue
+                  result = f"錯誤：API 呼叫失敗 - {str(e)}"
               
-              result = response.text
-              output_file = os.path.join(output_dir, os.path.basename(file_path))
-              print(f"取得 {file_path} API 回應成功，寫入 {output_file}...")
+              # 使用原始檔案名稱儲存結果
+              output_filename = os.path.basename(file_path)
+              output_file = os.path.join(output_dir, output_filename)
+              print(f"寫入結果至: {output_file}")
               
               try:
                   with open(output_file, "w", encoding="utf-8") as f:
