@@ -8,7 +8,7 @@ on:
 jobs:
   process-content:
     runs-on: ubuntu-latest
-    
+
     steps:
       # First checkout: Original repository to get p1.md and p2.md
       - name: Checkout original repository
@@ -27,17 +27,17 @@ jobs:
             echo "Error: p1.md not found in original repository"
             exit 1
           fi
-          
+
           if [ -f original-repo/p2.md ]; then
             p2_content=$(cat original-repo/p2.md)
           else
             echo "Error: p2.md not found in original repository"
             exit 1
           fi
-          
+
           # Escape newlines for GitHub output
-          echo "p1=$(echo "$p1_content" | tr '\n' '\\n')" >> $GITHUB_OUTPUT
-          echo "p2=$(echo "$p2_content" | tr '\n' '\\n')" >> $GITHUB_OUTPUT
+          echo "p1=$(echo "$p1_content" | jq -Rs @json)" >> $GITHUB_OUTPUT
+          echo "p2=$(echo "$p2_content" | jq -Rs @json)" >> $GITHUB_OUTPUT
         working-directory: original-repo
 
       # Step 0: Checkout mdn/content repository
@@ -65,30 +65,31 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           IFS=' ' read -r -a path_array <<< "${{ steps.get-paths.outputs.paths }}"
-          p1="${{ steps.get-content.outputs.p1 }}"
-          p2="${{ steps.get-content.outputs.p2 }}"
-          
+          p1=$(echo "${{ steps.get-content.outputs.p1 }}" | jq -r .)
+          p2=$(echo "${{ steps.get-content.outputs.p2 }}" | jq -r .)
+
           for path in "${path_array[@]}"; do
             # Check if content file exists in mdn-content
             if [ -f "mdn-content/$path" ]; then
-              content=$(cat "mdn-content/$path" | tr '\n' '\\n')
+              content=$(cat "mdn-content/$path" | jq -Rs @json)
+              content=$(echo "$content" | jq -r .)
             else
               echo "Warning: Content file not found for $path in mdn-content, using empty string"
               content=""
             fi
-            
+
             # Make API call
             response=$(curl -s -X POST "https://api.gemini.com/v1/process" \
               -H "Authorization: Bearer $GEMINI_API_KEY" \
               -H "Content-Type: application/json" \
               -d "{\"input\": \"$p1$content$p2\"}")
-            
+
             # Create directory if it doesn't exist in original-repo
             mkdir -p "original-repo/$(dirname "$path")"
-            
+
             # Save response
             echo "$response" > "original-repo/$path"
-            
+
             # Wait 2 seconds
             sleep 2
           done
