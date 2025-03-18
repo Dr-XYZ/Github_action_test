@@ -10,6 +10,36 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      # First checkout: Original repository to get p1.md and p2.md
+      - name: Checkout original repository
+        uses: actions/checkout@v3
+        with:
+          path: original-repo
+
+      # Step 2: Read p1.md and p2.md from original repository
+      - name: Read p1 and p2 content
+        id: get-content
+        run: |
+          # Check if files exist in original-repo, use default content if not found
+          if [ -f original-repo/p1.md ]; then
+            p1_content=$(cat original-repo/p1.md)
+          else
+            echo "Error: p1.md not found in original repository"
+            exit 1
+          fi
+          
+          if [ -f original-repo/p2.md ]; then
+            p2_content=$(cat original-repo/p2.md)
+          else
+            echo "Error: p2.md not found in original repository"
+            exit 1
+          fi
+          
+          # Escape newlines for GitHub output
+          echo "p1=$(echo "$p1_content" | tr '\n' '\\n')" >> $GITHUB_OUTPUT
+          echo "p2=$(echo "$p2_content" | tr '\n' '\\n')" >> $GITHUB_OUTPUT
+        working-directory: original-repo
+
       # Step 0: Checkout mdn/content repository
       - name: Checkout mdn/content
         uses: actions/checkout@v3
@@ -17,32 +47,19 @@ jobs:
           repository: mdn/content
           path: mdn-content
 
-      # Step 1: Checkout this repository and read README.md
-      - name: Checkout this repository
-        uses: actions/checkout@v3
-        with:
-          path: this-repo
-
+      # Step 1: Read and process README paths from original repo
       - name: Read and process README paths
         id: get-paths
         run: |
-          # Read README.md and process paths
-          paths=$(cat this-repo/README.md | sed 's|$|/index.md|' | tr '\n' ' ')
+          if [ ! -f original-repo/README.md ]; then
+            echo "Error: README.md not found in original repository"
+            exit 1
+          fi
+          paths=$(cat original-repo/README.md | sed 's|$|/index.md|' | tr '\n' ' ')
           echo "paths=$paths" >> $GITHUB_OUTPUT
-        working-directory: this-repo
+        working-directory: original-repo
 
-      # Step 2: Read p1.md and p2.md
-      - name: Read p1 and p2 content
-        id: get-content
-        run: |
-          p1_content=$(cat this-repo/p1.md)
-          p2_content=$(cat this-repo/p2.md)
-          # Escape newlines for GitHub output
-          echo "p1=$(echo "$p1_content" | tr '\n' '\\n')" >> $GITHUB_OUTPUT
-          echo "p2=$(echo "$p2_content" | tr '\n' '\\n')" >> $GITHUB_OUTPUT
-        working-directory: this-repo
-
-      # Step 3 & 4: Process each path with Gemini API and save results
+      # Step 3 & 4: Process with Gemini API and save results in original repo
       - name: Process with Gemini API
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -52,33 +69,38 @@ jobs:
           p2="${{ steps.get-content.outputs.p2 }}"
           
           for path in "${path_array[@]}"; do
-            # Read content from mdn-content
-            content=$(cat "mdn-content/$path" | tr '\n' '\\n')
+            # Check if content file exists in mdn-content
+            if [ -f "mdn-content/$path" ]; then
+              content=$(cat "mdn-content/$path" | tr '\n' '\\n')
+            else
+              echo "Warning: Content file not found for $path in mdn-content, using empty string"
+              content=""
+            fi
             
-            # Make API call (replace with actual Gemini API endpoint)
+            # Make API call
             response=$(curl -s -X POST "https://api.gemini.com/v1/process" \
               -H "Authorization: Bearer $GEMINI_API_KEY" \
               -H "Content-Type: application/json" \
               -d "{\"input\": \"$p1$content$p2\"}")
             
-            # Create directory if it doesn't exist
-            mkdir -p "this-repo/$(dirname "$path")"
+            # Create directory if it doesn't exist in original-repo
+            mkdir -p "original-repo/$(dirname "$path")"
             
             # Save response
-            echo "$response" > "this-repo/$path"
+            echo "$response" > "original-repo/$path"
             
             # Wait 2 seconds
             sleep 2
           done
 
-      # Commit and push results
+      # Commit and push results to original repository
       - name: Commit results
         run: |
-          cd this-repo
+          cd original-repo
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
           git add .
-          git commit -m "Update processed content"
+          git commit -m "Update processed content" || echo "No changes to commit"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
