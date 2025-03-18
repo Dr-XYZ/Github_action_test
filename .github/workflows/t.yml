@@ -1,0 +1,64 @@
+name: Process MDN Files with Gemini
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  process-mdn:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Read path list from README.md
+        id: read_paths
+        run: |
+          paths=$(grep -E '^[^#]' README.md | tr '\n' ' ')
+          echo "paths=$paths" >> $GITHUB_ENV
+
+      - name: Checkout MDN Content
+        uses: actions/checkout@v4
+        with:
+          repository: mdn/content
+          path: mdn_content
+
+      - name: Read Prompt Files
+        id: read_prompts
+        run: |
+          echo "p1=$(cat p1.txt)" >> $GITHUB_ENV
+          echo "p2=$(cat p2.txt)" >> $GITHUB_ENV
+
+      - name: Process and Send to Gemini
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          for path in $paths; do
+            mdn_file="mdn_content/$path"
+            output_file="$path"
+
+            if [ -f "$mdn_file" ]; then
+              content=$(cat "$mdn_file")
+              prompt="${{ env.p1 }}\n$content\n${{ env.p2 }}"
+
+              response=$(curl -X POST "https://api.gemini.com/v1/generate" \
+                -H "Authorization: Bearer $GEMINI_API_KEY" \
+                -H "Content-Type: application/json" \
+                -d "{\"prompt\": \"$prompt\"}" | jq -r '.text')
+
+              echo "$response" > "$output_file"
+            else
+              echo "File $mdn_file not found, skipping."
+            fi
+          done
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Update processed files from MDN Content" || echo "No changes to commit"
+          git push
