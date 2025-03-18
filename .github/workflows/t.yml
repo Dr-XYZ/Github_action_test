@@ -39,19 +39,22 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           while IFS= read -r path; do
-            mdn_file="mdn_content/${path}.md"
-            output_file="$path.md"
+            mdn_file="mdn_content/${path}/index.md"  # 加上 /index.md
+            output_file="${path}/index.md"  # 結果儲存至對應路徑
 
             if [ -f "$mdn_file" ]; then
               content=$(cat "$mdn_file")
               prompt="${{ env.p1 }}\n$content\n${{ env.p2 }}"
 
-              # 修改這裡，使用 Gemini 2.0 Flash 的 API 端點
+              # 使用 Gemini 2.0 Flash 的 API 端點
               json_payload=$(jq -n --arg prompt "$prompt" '{contents: [{parts: [{text: $prompt}]}]}')
               response=$(curl -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-flash:generateContent?key=${{ secrets.GEMINI_API_KEY }}" \
                 -H "Content-Type: application/json" \
                 -d "$json_payload" | jq -r '.candidates[0].content.parts[0].text')
 
+              # 儲存結果到文件並輸出到 terminal
+              echo "Generated content for ${path}/index.md:"  # 顯示在 terminal 中
+              echo "$response"
               echo "$response" > "$output_file"
 
               sleep 2  # 每次 API 請求後等待 2 秒
