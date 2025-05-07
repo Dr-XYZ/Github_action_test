@@ -2,50 +2,29 @@ import re
 import sys
 import os
 
-def is_chinese(char):
-    return '\u4e00' <= char <= '\u9fff'
+import re
 
-def is_english_or_number(char):
-    return char.isascii() and (char.isalpha() or char.isdigit())
+def spacing(text):
+    # 1. 刪除中文字+[中文字之間的多餘空格
+    text = re.sub(r'([\u4e00-\u9fff])\s+\[([\u4e00-\u9fff])', r'\1[\2', text)
 
-def fix_spacing(text):
-    # 一、處理 markdown 連結前後的空格問題
-    def link_spacing(match):
-        before = match.group(1) or ''
-        link_text = match.group(2)  # [文字](網址)
-        after = match.group(3) or ''
+    # 2. 刪除中文字+](link)+中文字之間的多餘空格
+    text = re.sub(r'([\u4e00-\u9fff])\s+\]\((.*?)\)\s+([\u4e00-\u9fff])', r'\1](\2)\3', text)
 
-        # 從 link_text 中提取中括號內的文字
-        inner_text = re.search(r'\[([^\]]+)\]', link_text).group(1)
-        first_inner = inner_text[0]
-        last_inner = inner_text[-1]
+    # 3. 中英混合：英文字 + [ + 中文字，若無空格則加入空格
+    text = re.sub(r'([a-zA-Z0-9])\[(?=[\u4e00-\u9fff])', r'\1 [', text)
 
-        # 判斷需不需要在 before 與 link 之間加空格
-        if before and is_chinese(before[-1]) and is_english_or_number(first_inner):
-            before += ' '
-        elif before and is_english_or_number(before[-1]) and is_chinese(first_inner):
-            before += ' '
-        elif before and before.endswith(' '):  # 避免多餘空格
-            before = before.rstrip()
+    # 4. 中英混合：英文字 + ](link) + 中文字，若無空格則加入空格
+    def add_space_after_link(match):
+        return f"{match.group(1)}](\{match.group(2)}) {match.group(3)}"
 
-        # 判斷需不需要在 link 與 after 之間加空格
-        if after and is_chinese(after[0]) and is_english_or_number(last_inner):
-            after = ' ' + after
-        elif after and is_english_or_number(after[0]) and is_chinese(last_inner):
-            after = ' ' + after
-        elif after and after.startswith(' '):  # 避免多餘空格
-            after = after.lstrip()
+    text = re.sub(r'([a-zA-Z0-9])\]\((.*?)\)(?=[\u4e00-\u9fff])', r'\1](\2) \3', text)
 
-        return f"{before}{link_text}{after}"
+    # 5. 中英混合：中文字 + [ + 英文字，若無空格則加入空格
+    text = re.sub(r'([\u4e00-\u9fff])\[(?=[a-zA-Z0-9])', r'\1 [', text)
 
-    text = re.sub(r'(.)?(\[[^\]]+\]\([^)]+\))(.?)', link_spacing, text)
-
-    # 二、處理一般中英混合：中→英 / 英→中都要空格
-    text = re.sub(r'([\u4e00-\u9fff])([A-Za-z0-9])', r'\1 \2', text)
-    text = re.sub(r'([A-Za-z0-9])([\u4e00-\u9fff])', r'\1 \2', text)
-
-    # 三、移除所有中文與中文之間的多餘空格
-    text = re.sub(r'([\u4e00-\u9fff])\s+([\u4e00-\u9fff])', r'\1\2', text)
+    # 6. 中英混合：中文字 + ](link) + 英文字，若無空格則加入空格
+    text = re.sub(r'([\u4e00-\u9fff])\]\((.*?)\)(?=[a-zA-Z0-9])', r'\1](\2) \3', text)
 
     return text
 
