@@ -1,42 +1,46 @@
 import re
 import os
 
-# 修正文字中的中英空格與中中空格
+# 進行格式修正：中英之間要有空格，中中之間不能有空格
 def fix_format(text):
-    # 中後英補空格
+    # 中文與英數之間補空格
     text = re.sub(r'([\u4e00-\u9fff])([A-Za-z0-9])', r'\1 \2', text)
-    # 英後中補空格
     text = re.sub(r'([A-Za-z0-9])([\u4e00-\u9fff])', r'\1 \2', text)
-    # 中文與中文之間不能有空格
+    # 中文與中文之間去掉空格
     text = re.sub(r'([\u4e00-\u9fff])\s+([\u4e00-\u9fff])', r'\1\2', text)
     return text
 
-# 修正單行
+# 修正單行文字
 def fix_line(line):
-    # 將超連結依照 pattern 拆開：[文字](連結)
     pattern = r'\[([^\]]+)\]\(([^)]+)\)'
     parts = []
+    texts = []
     last_index = 0
 
+    # 抽出連結與前後文字，並將渲染文字加入 texts
     for match in re.finditer(pattern, line):
         start, end = match.span()
-        # 處理連結前的普通文字
-        before = line[last_index:start]
-        parts.append(fix_format(before))
+        display, url = match.groups()
 
-        # 處理超連結內的顯示文字（修正格式）
-        text = fix_format(match.group(1))
-        url = match.group(2)
-        parts.append(f"[{text}]({url})")
+        before = line[last_index:start]
+        texts.append(before)               # 普通文字
+        texts.append(display)              # 超連結顯示文字
+        parts.append((len(texts) - 1, url))  # 標記哪段要包成 [xx](url)
 
         last_index = end
 
-    # 處理剩餘部分
-    parts.append(fix_format(line[last_index:]))
+    texts.append(line[last_index:])  # 加入最後一段文字
 
-    return ''.join(parts)
+    # 全部合併為一整段進行修正
+    fixed_texts = [fix_format(t) for t in texts]
 
-# 處理整個 markdown 檔案
+    # 重建原始結構，插入超連結
+    for idx, url in parts:
+        fixed_texts[idx] = f'[{fixed_texts[idx]}]({url})'
+
+    return ''.join(fixed_texts)
+
+# 修正整個 markdown 檔案
 def fix_file(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
         lines = f.readlines()
@@ -46,7 +50,7 @@ def fix_file(filepath):
     with open(filepath, 'w', encoding='utf-8') as f:
         f.writelines(fixed_lines)
 
-# 遍歷所有 md 檔案
+# 遍歷所有 markdown 檔案
 def fix_all_markdown_files():
     for root, _, files in os.walk('.'):
         for file in files:
