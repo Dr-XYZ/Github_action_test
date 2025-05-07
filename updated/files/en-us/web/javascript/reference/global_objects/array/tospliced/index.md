@@ -43,9 +43,7 @@ toSpliced(start, deleteCount, item1, item2, /* …, */ itemN)
 
     如果你未指定任何元素，則 `toSpliced()` 將僅從陣列中移除元素。
 
-### 回傳值
-
-一個新的陣列，包含 `start` 之前的所有元素、`item1`、`item2`、…、`itemN`，以及 `start + deleteCount` 之後的所有元素。
+### 回傳值一個新的陣列，包含 `start` 之前的所有元素、`item1`、`item2`、…、`itemN`，以及 `start + deleteCount` 之後的所有元素。
 
 ## 描述
 
@@ -57,9 +55,7 @@ toSpliced(start, deleteCount, item1, item2, /* …, */ itemN)
 
 ## 範例
 
-### 刪除、新增和替換元素
-
-你可以使用 `toSpliced()` 來刪除、新增和替換陣列中的元素，並建立一個新的陣列，這比使用 `slice()` 和 `concat()` 更有效率。
+### 刪除、新增和替換元素你可以使用 `toSpliced()` 來刪除、新增和替換陣列中的元素，並建立一個新的陣列，這比使用 `slice()` 和 `concat()` 更有效率。
 
 ```js
 const months = ["Jan", "Mar", "Apr", "May"];

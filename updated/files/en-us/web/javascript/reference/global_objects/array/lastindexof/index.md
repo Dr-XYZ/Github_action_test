@@ -39,9 +39,7 @@ lastIndexOf(searchElement, fromIndex)
     - 若 `fromIndex < -array.length`，則不會搜尋此陣列，並回傳 `-1`。你可以將它想像成從陣列開頭前不存在的位置開始，然後從那裡往後退。路徑上沒有陣列元素，因此永遠找不到 `searchElement`。
     - 若 `fromIndex >= array.length` 或省略 `fromIndex`，則會使用 `array.length - 1`，這會導致搜尋整個陣列。你可以將它想像成從陣列結尾後不存在的位置開始，然後從那裡往後退。它最終會到達陣列的真實結尾位置，此時它會開始反向搜尋實際的陣列元素。
 
-### 回傳值
-
-陣列中 `searchElement` 最後一次出現的索引；若找不到則回傳 `-1`。
+### 回傳值陣列中 `searchElement` 最後一次出現的索引；若找不到則回傳 `-1`。
 
 ## 描述
 
@@ -74,9 +72,7 @@ const array = [NaN];
 array.lastIndexOf(NaN); // -1
 ```
 
-### 找出元素的所有出現位置
-
-以下範例使用 `lastIndexOf` 來找出指定陣列中元素的所有索引，並使用 {{jsxref("Array/push", "push()")}} 將它們加到另一個陣列中。
+### 找出元素的所有出現位置以下範例使用 `lastIndexOf` 來找出指定陣列中元素的所有索引，並使用 {{jsxref("Array/push", "push()")}} 將它們加到另一個陣列中。
 
 ```js
 const indices = [];

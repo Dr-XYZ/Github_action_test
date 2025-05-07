@@ -32,7 +32,7 @@ some(callbackFn, thisArg)
 ### 參數
 
 - `callbackFn`
-  - : 針對陣列中的每個元素執行的函式。此函式應回傳一個 [真值](/zh-TW/docs/Glossary/Truthy) 以表示該元素通過測試，否則回傳一個 [假值](/zh-TW/docs/Glossary/Falsy)。呼叫此函式時會帶有以下引數：
+  - : 針對陣列中的每個元素執行的函式。此函式應回傳一個[真值](/zh-TW/docs/Glossary/Truthy)以表示該元素通過測試，否則回傳一個 [假值](/zh-TW/docs/Glossary/Falsy)。呼叫此函式時會帶有以下引數：
     - `element`
       - : 陣列中目前正在處理的元素。
     - `index`
@@ -42,9 +42,7 @@ some(callbackFn, thisArg)
 - `thisArg` {{optional_inline}}
   - : 執行 `callbackFn` 時作為 `this` 使用的值。參見 [迭代方法](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array#iterative_methods)。
 
-### 回傳值
-
-除非 `callbackFn` 為陣列元素回傳一個 {{Glossary("truthy")}} 值，否則回傳 `false`；在這種情況下，會立即回傳 `true`。
+### 回傳值除非 `callbackFn` 為陣列元素回傳一個 {{Glossary("truthy")}} 值，否則回傳 `false`；在這種情況下，會立即回傳 `true`。
 
 ## 描述
 
@@ -67,9 +65,7 @@ some(callbackFn, thisArg)
 
 ## 範例
 
-### 測試陣列元素的值
-
-以下範例測試陣列中是否有任何元素大於 10。
+### 測試陣列元素的值以下範例測試陣列中是否有任何元素大於 10。
 
 ```js
 function isBiggerThan10(element, index, array) {
@@ -80,19 +76,14 @@ function isBiggerThan10(element, index, array) {
 [12, 5, 8, 1, 4].some(isBiggerThan10); // true
 ```
 
-### 使用箭頭函式測試陣列元素
-
-[箭頭函式](/zh-TW/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
-為相同的測試提供更簡短的語法。
+### 使用箭頭函式測試陣列元素[箭頭函式](/zh-TW/docs/Web/JavaScript/Reference/Functions/Arrow_functions)為相同的測試提供更簡短的語法。
 
 ```js
 [2, 5, 8, 1, 4].some((x) => x > 10); // false
 [12, 5, 8, 1, 4].some((x) => x > 10); // true
 ```
 
-### 檢查陣列中是否存在某個值
-
-為了模仿 `includes()` 方法的功能，這個自訂函式會在元素存在於陣列中時回傳 `true`：
+### 檢查陣列中是否存在某個值為了模仿 `includes()` 方法的功能，這個自訂函式會在元素存在於陣列中時回傳 `true`：
 
 ```js
 const fruits = ["apple", "banana", "mango", "guava"];
@@ -124,9 +115,7 @@ getBoolean(1); // true
 getBoolean("true"); // true
 ```
 
-### 使用 callbackFn 的第三個引數
-
-如果你想存取陣列中的另一個元素，特別是當你沒有現有變數指向該陣列時，`array` 引數會很有用。以下範例首先使用 `filter()` 提取正值，然後使用 `some()` 檢查陣列是否嚴格遞增。
+### 使用 callbackFn 的第三個引數如果你想存取陣列中的另一個元素，特別是當你沒有現有變數指向該陣列時，`array` 引數會很有用。以下範例首先使用 `filter()` 提取正值，然後使用 `some()` 檢查陣列是否嚴格遞增。
 
 ```js
 const numbers = [3, -1, 1, 4, 1, 5];

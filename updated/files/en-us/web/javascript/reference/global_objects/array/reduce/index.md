@@ -223,9 +223,7 @@ const sum = objects.reduce(
 console.log(sum); // 6
 ```
 
-### 物件陣列中的值總和
-
-若要加總物件陣列中包含的值，**必須**提供 `initialValue`，以便每個項目都能傳遞到你的函式中。
+### 物件陣列中的值總和若要加總物件陣列中包含的值，**必須**提供 `initialValue`，以便每個項目都能傳遞到你的函式中。
 
 ```js
 const objects = [{ x: 1 }, { x: 2 }, { x: 3 }];

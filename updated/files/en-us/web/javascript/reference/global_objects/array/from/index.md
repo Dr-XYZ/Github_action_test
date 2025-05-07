@@ -41,9 +41,7 @@ Array.from(arrayLike, mapFn, thisArg)
 - `thisArg` {{optional_inline}}
   - : 執行 `mapFn` 時作為 `this` 使用的值。
 
-### 回傳值
-
-一個新的 {{jsxref("Array")}} 實例。
+### 回傳值一個新的 {{jsxref("Array")}} 實例。
 
 ## 描述
 
@@ -52,7 +50,7 @@ Array.from(arrayLike, mapFn, thisArg)
 - [可迭代物件](/zh-TW/docs/Web/JavaScript/Reference/Iteration_protocols)（例如 {{jsxref("Map")}} 和 {{jsxref("Set")}}）；或者，如果該物件不可迭代，
 - 類陣列物件（具有 `length` 屬性和索引元素的物件）。
 
-若要將不是可迭代或類陣列的普通物件轉換為陣列（透過枚舉其屬性鍵、值或兩者），請使用 {{jsxref("Object.keys()")}}, {{jsxref("Object.values()")}}, 或 {{jsxref("Object.entries()")}}. 若要將 [async iterable](/zh-TW/docs/Web/JavaScript/Reference/Iteration_protocols#the_async_iterator_and_async_iterable_protocols) 轉換為陣列，請使用 {{jsxref("Array.fromAsync()")}}.
+若要將不是可迭代或類陣列的普通物件轉換為陣列（透過枚舉其屬性鍵、值或兩者），請使用 {{jsxref("Object.keys()")}}, {{jsxref("Object.values()")}}, 或 {{jsxref("Object.entries()")}}. 若要將[async iterable](/zh-TW/docs/Web/JavaScript/Reference/Iteration_protocols#the_async_iterator_and_async_iterable_protocols)轉換為陣列，請使用 {{jsxref("Array.fromAsync()")}}.
 
 `Array.from()` 永遠不會建立稀疏陣列。如果 `arrayLike` 物件缺少某些索引屬性，則它們在新陣列中會變成 `undefined`。
 
@@ -60,9 +58,9 @@ Array.from(arrayLike, mapFn, thisArg)
 
 > [!NOTE]
 >
-> 此行為對於 [typed arrays](/zh-TW/docs/Web/JavaScript/Guide/Typed_arrays) 而言更為重要，因為中間陣列必須將值截斷以適應適當的類型。`Array.from()` 的實作使其具有與 {{jsxref("TypedArray.from()")}} 相同的簽名。
+> 此行為對於[typed arrays](/zh-TW/docs/Web/JavaScript/Guide/Typed_arrays)而言更為重要，因為中間陣列必須將值截斷以適應適當的類型。`Array.from()` 的實作使其具有與 {{jsxref("TypedArray.from()")}} 相同的簽名。
 
-`Array.from()` 方法是一個泛型工廠方法。例如，如果 `Array` 的子類別繼承了 `from()` 方法，則繼承的 `from()` 方法將會回傳子類別的新實例，而不是 `Array` 實例。實際上，`this` 值可以是任何接受單一參數（代表新陣列的長度）的建構函式。當可迭代物件作為 `arrayLike` 傳遞時，會呼叫不帶參數的建構函式；當類陣列物件傳遞時，會呼叫帶有類陣列物件的 [正規化長度](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array#normalization_of_the_length_property) 的建構函式。在迭代完成時，最終的 `length` 將會再次設定。如果 `this` 值不是建構函式，則會改為使用 plain `Array` 建構函式。
+`Array.from()` 方法是一個泛型工廠方法。例如，如果 `Array` 的子類別繼承了 `from()` 方法，則繼承的 `from()` 方法將會回傳子類別的新實例，而不是 `Array` 實例。實際上，`this` 值可以是任何接受單一參數（代表新陣列的長度）的建構函式。當可迭代物件作為 `arrayLike` 傳遞時，會呼叫不帶參數的建構函式；當類陣列物件傳遞時，會呼叫帶有類陣列物件的[正規化長度](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array#normalization_of_the_length_property)的建構函式。在迭代完成時，最終的 `length` 將會再次設定。如果 `this` 值不是建構函式，則會改為使用 plain `Array` 建構函式。
 
 ## 範例
 

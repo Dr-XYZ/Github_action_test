@@ -23,7 +23,7 @@ Array.fromAsync(arrayLike, mapFn, thisArg)
 - `arrayLike`
   - : 一個要轉換為陣列的非同步可迭代、可迭代或類陣列物件。
 - `mapFn` {{optional_inline}}
-  - : 將在陣列的每個元素上呼叫的函式。如果提供，則要新增到陣列的每個值都會先經過此函式，並且會將 `mapFn` 的回傳值（在[await](/zh-TW/docs/Web/JavaScript/Reference/Operators/await) 之後）新增到陣列中。該函式會使用以下引數呼叫：
+  - : 將在陣列的每個元素上呼叫的函式。如果提供，則要新增到陣列的每個值都會先經過此函式，並且會將 `mapFn` 的回傳值（在[await](/zh-TW/docs/Web/JavaScript/Reference/Operators/await)之後）新增到陣列中。該函式會使用以下引數呼叫：
     - `element`
       - : 陣列中目前正在處理的元素。由於所有元素都首先被 [await](/zh-TW/docs/Web/JavaScript/Reference/Operators/await)，因此此值永遠不會是 [thenable](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Promise#thenables)。
     - `index`
@@ -31,9 +31,7 @@ Array.fromAsync(arrayLike, mapFn, thisArg)
 - `thisArg` {{optional_inline}}
   - : 執行 `mapFn` 時要用作 `this` 的值。
 
-### 回傳值
-
-一個新的 {{jsxref("Promise")}}，其 fulfillment value 是一個新的 {{jsxref("Array")}} 實例。
+### 回傳值一個新的 {{jsxref("Promise")}}，其 fulfillment value 是一個新的 {{jsxref("Array")}} 實例。
 
 ## 描述
 
@@ -144,9 +142,7 @@ function* makeIterableOfPromises() {
 })();
 ```
 
-### 對於同步可迭代物件沒有錯誤處理
-
-與 [`for await...of`](/zh-TW/docs/Web/JavaScript/Reference/Statements/for-await...of#iterating_over_sync_iterables_and_generators) 類似，如果迭代的物件是同步可迭代物件，並且在迭代時發生錯誤，則不會呼叫底層迭代器的 `return()` 方法，因此迭代器不會關閉。
+### 對於同步可迭代物件沒有錯誤處理與[`for await...of`](/zh-TW/docs/Web/JavaScript/Reference/Statements/for-await...of#iterating_over_sync_iterables_and_generators)類似，如果迭代的物件是同步可迭代物件，並且在迭代時發生錯誤，則不會呼叫底層迭代器的 `return()` 方法，因此迭代器不會關閉。
 
 ```js
 function* generatorWithRejectedPromises() {

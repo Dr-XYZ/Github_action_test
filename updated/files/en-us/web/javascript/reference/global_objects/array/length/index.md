@@ -72,9 +72,7 @@ arr.forEach((element) => console.log(element));
 
 ## Examples
 
-### 迭代陣列
-
-在以下範例中，陣列 `numbers` 通過查看 `length` 屬性進行迭代。然後將每個元素中的值加倍。
+### 迭代陣列在以下範例中，陣列 `numbers` 通過查看 `length` 屬性進行迭代。然後將每個元素中的值加倍。
 
 ```js
 const numbers = [1, 2, 3, 4, 5];
@@ -85,9 +83,7 @@ for (let i = 0; i < length; i++) {
 // numbers is now [2, 4, 6, 8, 10]
 ```
 
-### 縮短陣列
-
-如果目前長度大於 3，則以下範例將陣列 `numbers` 縮短為長度 3。
+### 縮短陣列如果目前長度大於 3，則以下範例將陣列 `numbers` 縮短為長度 3。
 
 ```js
 const numbers = [1, 2, 3, 4, 5];
@@ -101,9 +97,7 @@ console.log(numbers.length); // 3
 console.log(numbers[3]); // undefined; the extra elements are deleted
 ```
 
-### 建立固定長度的空陣列
-
-將 `length` 設定為大於目前長度的值會建立一個[稀疏陣列](/zh-TW/docs/Web/JavaScript/Guide/Indexed_collections#sparse_arrays)。
+### 建立固定長度的空陣列將 `length` 設定為大於目前長度的值會建立一個[稀疏陣列](/zh-TW/docs/Web/JavaScript/Guide/Indexed_collections#sparse_arrays)。
 
 ```js
 const numbers = [];
@@ -111,9 +105,7 @@ numbers.length = 3;
 console.log(numbers); // [empty x 3]
 ```
 
-### 具有不可寫入長度的陣列
-
-當元素被新增到超出目前長度時，陣列會自動更新 `length` 屬性。如果 `length` 屬性被設定為不可寫入，則陣列將無法更新它。這會在[嚴格模式](/zh-TW/docs/Web/JavaScript/Reference/Strict_mode)中導致錯誤。
+### 具有不可寫入長度的陣列當元素被新增到超出目前長度時，陣列會自動更新 `length` 屬性。如果 `length` 屬性被設定為不可寫入，則陣列將無法更新它。這會在[嚴格模式](/zh-TW/docs/Web/JavaScript/Reference/Strict_mode)中導致錯誤。
 
 ```js
 "use strict";

@@ -19,9 +19,7 @@ browser-compat: javascript.builtins.Array.@@species
 Array[Symbol.species]
 ```
 
-### 回傳值
-
-呼叫 `get [Symbol.species]` 的建構子（`this`）的值。回傳值用於從建立新陣列的陣列方法建構回傳值。
+### 回傳值呼叫 `get [Symbol.species]` 的建構子（`this`）的值。回傳值用於從建立新陣列的陣列方法建構回傳值。
 
 ## 描述
 

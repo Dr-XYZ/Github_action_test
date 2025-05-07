@@ -62,9 +62,7 @@ slice(start, end)
     - 如果 `end >= array.length` 或 `end` 被省略，則使用 `array.length`，導致提取到最後的所有元素。
     - 如果 `end` 隱含的位置在 `start` 隱含的位置之前或相同，則會回傳一個空陣列。
 
-### 回傳值
-
-包含提取元素的新陣列。
+### 回傳值包含提取元素的新陣列。
 
 ## 描述
 
@@ -149,9 +147,7 @@ read from start --->
 <--- 從反向讀取
 ```
 
-### 將 slice 與物件陣列一起使用
-
-在以下範例中，`slice` 從 `myCar` 建立一個新陣列 `newCar`。兩者都包含對物件 `myHonda` 的參照。當 `myHonda` 的顏色變更為紫色時，兩個陣列都會反映此變更。
+### 將 slice 與物件陣列一起使用在以下範例中，`slice` 從 `myCar` 建立一個新陣列 `newCar`。兩者都包含對物件 `myHonda` 的參照。當 `myHonda` 的顏色變更為紫色時，兩個陣列都會反映此變更。
 
 ```js
 // Using slice, create newCar from myCar.

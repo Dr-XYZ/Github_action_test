@@ -22,13 +22,9 @@ toSorted(compareFn)
 - `compareFn` {{optional_inline}}
   - : 一個決定元素順序的函式。如果省略，陣列元素會被轉換為字串，然後根據每個字元的 Unicode 碼位值進行排序。參見 {{jsxref("Array/sort", "sort()")}} 以取得更多訊息。
 
-### 回傳值
+### 回傳值一個新的陣列，其元素會以遞增排序。
 
-一個新的陣列，其元素會以遞增排序。
-
-## 描述
-
-參見 {{jsxref("Array/sort", "sort()")}} 以取得更多關於 `compareFn` 參數的訊息。
+## 描述參見 {{jsxref("Array/sort", "sort()")}} 以取得更多關於 `compareFn` 參數的訊息。
 
 當用於[稀疏陣列](/en-US/docs/Web/JavaScript/Guide/Indexed_collections#sparse_arrays)時，`toSorted()` 方法會迭代空插槽，如同它們具有 `undefined` 值一樣。
 

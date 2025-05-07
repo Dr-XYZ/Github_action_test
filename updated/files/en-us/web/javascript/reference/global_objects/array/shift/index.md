@@ -30,13 +30,9 @@ console.log(firstElement);
 shift()
 ```
 
-### 參數
+### 參數無。
 
-無。
-
-### 回傳值
-
-從陣列中移除的元素；如果陣列為空，則回傳 {{jsxref("undefined")}}。
+### 回傳值從陣列中移除的元素；如果陣列為空，則回傳 {{jsxref("undefined")}}。
 
 ## 描述
 
@@ -44,15 +40,13 @@ shift()
 
 {{jsxref("Array/pop", "pop()")}} 方法的行為與 `shift()` 相似，但作用於陣列中的最後一個元素。
 
-`shift()` 方法是一種[變異方法](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array#複製方法與變異方法)。它會改變 `this` 的長度和內容。如果你希望 `this` 的值不變，但回傳一個移除第一個元素的新陣列，則可以使用 [`arr.slice(1)`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) 來代替。
+`shift()` 方法是一種[變異方法](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array#複製方法與變異方法)。它會改變 `this` 的長度和內容。如果你希望 `this` 的值不變，但回傳一個移除第一個元素的新陣列，則可以使用[`arr.slice(1)`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)來代替。
 
 `shift()` 方法是[泛用的](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array#泛用陣列方法)。它只期望 `this` 值具有 `length` 屬性和整數鍵屬性。雖然字串也類似陣列，但此方法不適合應用於字串，因為字串是不可變的。
 
 ## 範例
 
-### 從陣列中移除元素
-
-以下程式碼顯示移除第一個元素前後的 `myFish` 陣列。它也顯示了移除的元素：
+### 從陣列中移除元素以下程式碼顯示移除第一個元素前後的 `myFish` 陣列。它也顯示了移除的元素：
 
 ```js
 const myFish = ["angel", "clown", "mandarin", "surgeon"];

@@ -31,13 +31,9 @@ for (const value of iterator) {
 values()
 ```
 
-### 參數
+### 參數無。
 
-無。
-
-### 回傳值
-
-一個新的[可迭代的迭代器物件](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Iterator)。
+### 回傳值一個新的[可迭代的迭代器物件](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Iterator)。
 
 ## 描述
 
@@ -53,9 +49,7 @@ Array.prototype.values === Array.prototype[Symbol.iterator]; // true
 
 ## 範例
 
-### 使用 for...of 迴圈進行迭代
-
-因為 `values()` 會回傳一個可迭代的迭代器，所以你可以使用 [`for...of`](/zh-TW/docs/Web/JavaScript/Reference/Statements/for...of) 迴圈來迭代它。
+### 使用 for...of 迴圈進行迭代因為 `values()` 會回傳一個可迭代的迭代器，所以你可以使用[`for...of`](/zh-TW/docs/Web/JavaScript/Reference/Statements/for...of)迴圈來迭代它。
 
 ```js
 const arr = ["a", "b", "c", "d", "e"];
@@ -66,9 +60,7 @@ for (const letter of iterator) {
 } // "a" "b" "c" "d" "e"
 ```
 
-### 使用 next() 進行迭代
-
-因為回傳值也是一個迭代器，所以你可以直接呼叫它的 `next()` 方法。
+### 使用 next() 進行迭代因為回傳值也是一個迭代器，所以你可以直接呼叫它的 `next()` 方法。
 
 ```js
 const arr = ["a", "b", "c", "d", "e"];
@@ -102,7 +94,7 @@ for (const letter of values) {
 // undefined
 ```
 
-如果你使用 [`break`](/zh-TW/docs/Web/JavaScript/Reference/Statements/break) 敘述提早結束迭代，則當繼續迭代它時，迭代器可以從目前位置恢復。
+如果你使用[`break`](/zh-TW/docs/Web/JavaScript/Reference/Statements/break)敘述提早結束迭代，則當繼續迭代它時，迭代器可以從目前位置恢復。
 
 ```js
 const arr = ["a", "b", "c", "d", "e"];
@@ -121,9 +113,7 @@ for (const letter of values) {
 // "c" "d" "e"
 ```
 
-### 迭代期間的變更
-
-沒有任何值儲存在從 `values()` 回傳的陣列迭代器物件中；相反地，它儲存了在其建立中使用的陣列的位址，並且在每次迭代時讀取目前存取的索引。因此，其迭代輸出取決於在步驟執行時儲存在該索引中的值。如果陣列中的值已變更，則陣列迭代器物件的值也會變更。
+### 迭代期間的變更沒有任何值儲存在從 `values()` 回傳的陣列迭代器物件中；相反地，它儲存了在其建立中使用的陣列的位址，並且在每次迭代時讀取目前存取的索引。因此，其迭代輸出取決於在步驟執行時儲存在該索引中的值。如果陣列中的值已變更，則陣列迭代器物件的值也會變更。
 
 ```js
 const arr = ["a", "b", "c", "d", "e"];

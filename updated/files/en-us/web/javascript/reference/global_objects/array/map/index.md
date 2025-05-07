@@ -44,9 +44,7 @@ map(callbackFn, thisArg)
 - `thisArg` {{optional_inline}}
   - : 當執行 `callbackFn` 時，用來作為 `this` 的值。參見[迭代方法](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array#iterative_methods)。
 
-### 回傳值
-
-一個新的陣列，其每個元素皆是回呼函式的結果。
+### 回傳值一個新的陣列，其每個元素皆是回呼函式的結果。
 
 ## 描述
 
@@ -60,9 +58,7 @@ map(callbackFn, thisArg)
 
 ## 範例
 
-### 將數字陣列映射到平方根陣列
-
-下列程式碼取得一個數字陣列，並建立一個新的陣列，其中包含第一個陣列中數字的平方根。
+### 將數字陣列映射到平方根陣列下列程式碼取得一個數字陣列，並建立一個新的陣列，其中包含第一個陣列中數字的平方根。
 
 ```js
 const numbers = [1, 4, 9];
@@ -74,9 +70,7 @@ const roots = numbers.map((num) => Math.sqrt(num));
 // numbers 仍然是 [1, 4, 9]
 ```
 
-### 使用 map 重新格式化陣列中的物件
-
-下列程式碼取得一個物件陣列，並建立一個新的陣列，其中包含新重新格式化的物件。
+### 使用 map 重新格式化陣列中的物件下列程式碼取得一個物件陣列，並建立一個新的陣列，其中包含新重新格式化的物件。
 
 ```js
 const kvArray = [
@@ -96,9 +90,7 @@ console.log(kvArray);
 // ]
 ```
 
-### 將 parseInt() 與 map() 搭配使用
-
-通常會使用帶有一個參數（正在遍歷的元素）的回呼。某些函式也常與一個參數一起使用，即使它們帶有額外的可選參數。這些習慣可能會導致混淆的行為。請考慮：
+### 將 parseInt() 與 map() 搭配使用通常會使用帶有一個參數（正在遍歷的元素）的回呼。某些函式也常與一個參數一起使用，即使它們帶有額外的可選參數。這些習慣可能會導致混淆的行為。請考慮：
 
 ```js
 ["1", "2", "3"].map(parseInt);
@@ -139,7 +131,7 @@ console.log(kvArray);
 ["1.1", "2.2e2", "3e300"].map((str) => parseInt(str, 10)); // [1, 2, 3]
 ```
 
-參見 Allen Wirfs-Brock 的 [A JavaScript optional argument hazard](https://wirfs-brock.com/allen/posts/166) 以獲得更多討論。
+參見 Allen Wirfs-Brock 的[A JavaScript optional argument hazard](https://wirfs-brock.com/allen/posts/166)以獲得更多討論。
 
 ### 映射的陣列包含 undefined
 
@@ -161,9 +153,7 @@ const filteredNumbers = numbers.map((num, index) => {
 // numbers 仍然為 [1, 2, 3, 4]
 ```
 
-### 具有副作用的映射
-
-回呼可以具有副作用。
+### 具有副作用的映射回呼可以具有副作用。
 
 ```js
 const cart = [5, 15, 25];
@@ -214,9 +204,7 @@ const productsWithPrice = products.map((product) => {
 });
 ```
 
-### 使用 callbackFn 的第三個參數
-
-如果你想要存取陣列中的另一個元素，`array` 參數會很有用，尤其是當你沒有現有變數指向該陣列時。下列範例首先使用 `filter()` 提取正值，然後使用 `map()` 建立一個新的陣列，其中每個元素都是其相鄰元素與其自身的平均值。
+### 使用 callbackFn 的第三個參數如果你想要存取陣列中的另一個元素，`array` 參數會很有用，尤其是當你沒有現有變數指向該陣列時。下列範例首先使用 `filter()` 提取正值，然後使用 `map()` 建立一個新的陣列，其中每個元素都是其相鄰元素與其自身的平均值。
 
 ```js
 const numbers = [3, -1, 1, 4, 1, 5, 9, 2, 6];

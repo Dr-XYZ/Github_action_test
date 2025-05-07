@@ -44,13 +44,11 @@ includes(searchElement, fromIndex)
     - 如果 `fromIndex < -array.length` 或省略 `fromIndex`，則使用 `0`，導致搜尋整個陣列。
     - 如果 `fromIndex >= array.length`，則不會搜尋陣列，並回傳 `false`。
 
-### 回傳值
-
-如果值 `searchElement` 在陣列中（或在索引 `fromIndex` 指示的陣列部分中，如果已指定）找到，則布林值為 `true`。
+### 回傳值如果值 `searchElement` 在陣列中（或在索引 `fromIndex` 指示的陣列部分中，如果已指定）找到，則布林值為 `true`。
 
 ## 描述
 
-`includes()` 方法使用 [SameValueZero](/zh-TW/docs/Web/JavaScript/Guide/Equality_comparisons_and_sameness#same-value-zero_equality) 演算法比較 `searchElement` 與陣列的元素。數值 0 都被認為是相等的，無論符號如何（也就是說，`-0` 等於 `0`），但 `false` _不_ 被認為與 `0` 相同。 可以正確地搜尋 [`NaN`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/NaN)。
+`includes()` 方法使用[SameValueZero](/zh-TW/docs/Web/JavaScript/Guide/Equality_comparisons_and_sameness#same-value-zero_equality)演算法比較 `searchElement` 與陣列的元素。數值 0 都被認為是相等的，無論符號如何（也就是說，`-0` 等於 `0`），但 `false` _不_ 被認為與 `0` 相同。 可以正確地搜尋 [`NaN`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/NaN)。
 
 當用於[稀疏陣列](/zh-TW/docs/Web/JavaScript/Guide/Indexed_collections#sparse_arrays)時，`includes()` 方法會將空插槽視為具有值 `undefined` 來進行迭代。
 
@@ -69,9 +67,7 @@ includes(searchElement, fromIndex)
 ["1", "2", "3"].includes(3); // false
 ```
 
-### fromIndex 大於或等於陣列長度
-
-如果 `fromIndex` 大於或等於陣列的長度，則會回傳 `false`。將不會搜尋陣列。
+### fromIndex 大於或等於陣列長度如果 `fromIndex` 大於或等於陣列的長度，則會回傳 `false`。將不會搜尋陣列。
 
 ```js
 const arr = ["a", "b", "c"];

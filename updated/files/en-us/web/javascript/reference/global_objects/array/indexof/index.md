@@ -43,9 +43,7 @@ indexOf(searchElement, fromIndex)
     - 如果 `fromIndex < -array.length` 或省略 `fromIndex`，則會使用 `0`，導致搜尋整個陣列。
     - 如果 `fromIndex >= array.length`，則不會搜尋陣列，並回傳 `-1`。
 
-### 回傳值
-
-陣列中 `searchElement` 的第一個索引；如果找不到，則為 `-1`。
+### 回傳值陣列中 `searchElement` 的第一個索引；如果找不到，則為 `-1`。
 
 ## 描述
 

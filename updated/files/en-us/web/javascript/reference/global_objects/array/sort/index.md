@@ -56,13 +56,9 @@ sort(compareFn)
 
     如果省略，陣列元素會轉換為字串，然後根據每個字元的 Unicode 程式碼點值進行排序。
 
-### 回傳值
+### 回傳值已排序之原始陣列的參照。請注意，該陣列是原地（[in place](https://en.wikipedia.org/wiki/In-place_algorithm)）排序的，且不進行複製。
 
-已排序之原始陣列的參照。請注意，該陣列是原地（[in place](https://en.wikipedia.org/wiki/In-place_algorithm)）排序的，且不進行複製。
-
-## 描述
-
-如果未提供 `compareFn`，則所有非 `undefined` 陣列元素都會透過將它們轉換為字串並以 UTF-16 程式碼單元順序比較字串來排序。例如，"banana" 在 "cherry" 之前。在數值排序中，9 在 80 之前，但由於數字會轉換為字串，因此在 Unicode 順序中 "80" 在 "9" 之前。所有 `undefined` 元素都會排序到陣列的末尾。
+## 描述如果未提供 `compareFn`，則所有非 `undefined` 陣列元素都會透過將它們轉換為字串並以 UTF-16 程式碼單元順序比較字串來排序。例如，"banana" 在 "cherry" 之前。在數值排序中，9 在 80 之前，但由於數字會轉換為字串，因此在 Unicode 順序中 "80" 在 "9" 之前。所有 `undefined` 元素都會排序到陣列的末尾。
 
 `sort()` 方法會保留空槽。如果原始陣列是[稀疏陣列](/zh-TW/docs/Web/JavaScript/Guide/Indexed_collections#sparse_arrays)，則空槽會移到陣列的末尾，並且永遠在所有 `undefined` 之後。
 
@@ -115,9 +111,7 @@ function compareNumbers(a, b) {
 
 ## 範例
 
-### 建立、顯示和排序陣列
-
-以下範例建立四個陣列，並顯示原始陣列，然後顯示排序後的陣列。數值陣列在沒有比較函式的情況下排序，然後在使用比較函式的情況下排序。
+### 建立、顯示和排序陣列以下範例建立四個陣列，並顯示原始陣列，然後顯示排序後的陣列。數值陣列在沒有比較函式的情況下排序，然後在使用比較函式的情況下排序。
 
 ```js
 const stringArray = ["Blue", "Humpback", "Beluga"];
@@ -145,9 +139,7 @@ mixedNumericArray.sort(); // [1, 200, 40, 5, '700', '80', '9']
 mixedNumericArray.sort(compareNumbers); // [1, 5, '9', 40, '80', 200, '700']
 ```
 
-### 排序物件陣列
-
-物件陣列可以透過比較它們的其中一個屬性的值來排序。
+### 排序物件陣列物件陣列可以透過比較它們的其中一個屬性的值來排序。
 
 ```js
 const items = [
@@ -178,9 +170,7 @@ items.sort((a, b) => {
 });
 ```
 
-### 排序非 ASCII 字元
-
-對於排序具有非 {{Glossary("ASCII")}} 字元的字串，即具有重音符號的字串（e, é, è, a, ä 等），以及來自英語以外語言的字串，請使用 {{jsxref("String.prototype.localeCompare()")}}。此函式可以比較這些字元，以便它們以正確的順序顯示。
+### 排序非 ASCII 字元對於排序具有非 {{Glossary("ASCII")}} 字元的字串，即具有重音符號的字串（e, é, è, a, ä 等），以及來自英語以外語言的字串，請使用 {{jsxref("String.prototype.localeCompare()")}}。此函式可以比較這些字元，以便它們以正確的順序顯示。
 
 ```js
 const items = ["réservé", "premier", "communiqué", "café", "adieu", "éclair"];
@@ -191,7 +181,7 @@ items.sort((a, b) => a.localeCompare(b));
 
 ### 使用 map 排序
 
-`compareFn` 可以在陣列中的每個元素呼叫多次。根據 `compareFn` 的性質，這可能會產生很高的負擔。`compareFn` 執行的工作越多，並且要排序的元素越多，使用 [`map()`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/map) 進行排序可能更有效率。這個想法是遍歷陣列一次，以將用於排序的實際值提取到一個臨時陣列中，對臨時陣列進行排序，然後遍歷臨時陣列以實現正確的順序。
+`compareFn` 可以在陣列中的每個元素呼叫多次。根據 `compareFn` 的性質，這可能會產生很高的負擔。`compareFn` 執行的工作越多，並且要排序的元素越多，使用[`map()`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/map)進行排序可能更有效率。這個想法是遍歷陣列一次，以將用於排序的實際值提取到一個臨時陣列中，對臨時陣列進行排序，然後遍歷臨時陣列以實現正確的順序。
 
 ```js
 // the array to be sorted
@@ -216,7 +206,7 @@ mapped.sort((a, b) => {
 const result = mapped.map((v) => data[v.i]);
 ```
 
-有一個名為 [mapsort](https://github.com/Pimm/mapsort) 的開放原始碼函式庫可用，它應用了這種方法。
+有一個名為[mapsort](https://github.com/Pimm/mapsort)的開放原始碼函式庫可用，它應用了這種方法。
 
 ### sort() 回傳對同一個陣列的參照
 
@@ -230,7 +220,7 @@ sorted[0] = 10;
 console.log(numbers[0]); // 10
 ```
 
-如果你希望 `sort()` 不會更改原始陣列，而是像其他陣列方法（例如 [`map()`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/map)）一樣回傳一個[淺複製](/zh-TW/docs/Glossary/Shallow_copy)的陣列，請使用 {{jsxref("Array/toSorted", "toSorted()")}} 方法。或者，你可以在呼叫 `sort()` 之前使用[展開語法](/zh-TW/docs/Web/JavaScript/Reference/Operators/Spread_syntax) 或 [`Array.from()`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/from) 進行淺複製。
+如果你希望 `sort()` 不會更改原始陣列，而是像其他陣列方法（例如 [`map()`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/map)）一樣回傳一個[淺複製](/zh-TW/docs/Glossary/Shallow_copy)的陣列，請使用 {{jsxref("Array/toSorted", "toSorted()")}} 方法。或者，你可以在呼叫 `sort()` 之前使用[展開語法](/zh-TW/docs/Web/JavaScript/Reference/Operators/Spread_syntax)或[`Array.from()`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/from)進行淺複製。
 
 ```js
 const numbers = [3, 1, 4, 1, 5];
@@ -240,9 +230,7 @@ sorted[0] = 10;
 console.log(numbers[0]); // 3
 ```
 
-### 排序穩定性
-
-自 10 版（或 ECMAScript 2019）以來，規範規定 `Array.prototype.sort` 是穩定的。
+### 排序穩定性自 10 版（或 ECMAScript 2019）以來，規範規定 `Array.prototype.sort` 是穩定的。
 
 例如，假設你有一個學生名單以及他們的成績。請注意，學生名單已經按字母順序依名稱預先排序：
 
@@ -285,9 +273,7 @@ students.sort((firstItem, secondItem) => firstItem.grade - secondItem.grade);
 ];
 ```
 
-### 使用非形式良好的比較器進行排序
-
-如果比較函式不滿足[描述](#description)中解釋的所有純粹性、穩定性、自反性、反對稱性和傳遞性規則，則程式的行為未定義。
+### 使用非形式良好的比較器進行排序如果比較函式不滿足[描述](#description)中解釋的所有純粹性、穩定性、自反性、反對稱性和傳遞性規則，則程式的行為未定義。
 
 例如，考慮以下程式碼：
 

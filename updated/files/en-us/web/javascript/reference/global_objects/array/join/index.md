@@ -37,15 +37,11 @@ join(separator)
 - `separator` {{optional_inline}}
   - : 用於分隔陣列中每對相鄰元素的字串。如果省略，陣列元素會以逗號（「,」）分隔。
 
-### 回傳值
+### 回傳值一個包含所有陣列元素的串連字串。如果 `array.length` 為 `0`，則回傳空字串。
 
-一個包含所有陣列元素的串連字串。如果 `array.length` 為 `0`，則回傳空字串。
+## 描述所有陣列元素的字串轉換會被合併成一個字串。如果元素是 `undefined` 或 `null`，它會被轉換成空字串，而不是字串 `"null"` 或 `"undefined"`。
 
-## 描述
-
-所有陣列元素的字串轉換會被合併成一個字串。如果元素是 `undefined` 或 `null`，它會被轉換成空字串，而不是字串 `"null"` 或 `"undefined"`。
-
-`join` 方法在內部會被沒有參數的 [`Array.prototype.toString()`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/toString) 存取。覆寫陣列實例的 `join` 也會覆寫其 `toString` 行為。
+`join` 方法在內部會被沒有參數的[`Array.prototype.toString()`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/toString)存取。覆寫陣列實例的 `join` 也會覆寫其 `toString` 行為。
 
 `Array.prototype.join` 會遞迴地將每個元素（包含其他陣列）轉換為字串。由於 `Array.prototype.toString`（與呼叫 `join()` 相同）回傳的字串沒有分隔符，因此巢狀陣列看起來像是被扁平化了。你只能控制第一層的分隔符，而更深的層級總是使用預設的逗號。
 
@@ -74,9 +70,7 @@ console.log(arr.join(";")); // 1;3,,4;2
 
 ## 範例
 
-### 以四種不同方式加入陣列
-
-以下範例建立一個具有三個元素的陣列 `a`，然後加入該陣列四次：使用預設分隔符、逗號和空格、加號以及空字串。
+### 以四種不同方式加入陣列以下範例建立一個具有三個元素的陣列 `a`，然後加入該陣列四次：使用預設分隔符、逗號和空格、加號以及空字串。
 
 ```js
 const a = ["Wind", "Water", "Fire"];

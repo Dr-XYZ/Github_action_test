@@ -38,9 +38,7 @@ toLocaleString(locales, options)
 - `options` {{optional_inline}}
   - : 具有組態屬性的物件。你可以在此處傳遞的內容取決於要轉換的元素。例如，對於數字，參見 {{jsxref("Number.prototype.toLocaleString()")}}。
 
-### 回傳值
-
-一個表示陣列中各個元素的字串。
+### 回傳值一個表示陣列中各個元素的字串。
 
 ## 描述
 

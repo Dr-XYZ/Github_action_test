@@ -34,13 +34,9 @@ console.log("array1:", array1);
 reverse()
 ```
 
-### 參數
+### 參數無。
 
-無。
-
-### 回傳值
-
-回傳已反轉的原始陣列的參照。請注意，陣列是原地（_[in place](https://en.wikipedia.org/wiki/In-place_algorithm)_）反轉的，而且不會建立副本。
+### 回傳值回傳已反轉的原始陣列的參照。請注意，陣列是原地（_[in place](https://en.wikipedia.org/wiki/In-place_algorithm)_）反轉的，而且不會建立副本。
 
 ## 描述
 
@@ -52,9 +48,7 @@ reverse()
 
 ## 範例
 
-### 反轉陣列中的元素
-
-以下範例會建立一個包含三個元素的陣列 `items`，然後反轉該陣列。呼叫 `reverse()` 會回傳對已反轉陣列 `items` 的參照。
+### 反轉陣列中的元素以下範例會建立一個包含三個元素的陣列 `items`，然後反轉該陣列。呼叫 `reverse()` 會回傳對已反轉陣列 `items` 的參照。
 
 ```js
 const items = [1, 2, 3];

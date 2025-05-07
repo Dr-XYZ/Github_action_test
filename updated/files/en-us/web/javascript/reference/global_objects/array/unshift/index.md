@@ -36,9 +36,7 @@ unshift(element1, element2, /* …, */ elementN)
 - `element1`, …, `elementN`
   - : 要加到 `arr` 最前面的元素。
 
-### 回傳值
-
-呼叫此方法的物件之新的 {{jsxref("Array/length", "length")}} 屬性。
+### 回傳值呼叫此方法的物件之新的 {{jsxref("Array/length", "length")}} 屬性。
 
 ## 描述
 

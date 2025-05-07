@@ -41,15 +41,13 @@ Array.isArray(value)
 - `value`
   - : 要檢查的值。
 
-### 回傳值
-
-如果 `value` 為 {{jsxref("Array")}}，則回傳 `true`；否則回傳 `false`。如果 `value` 為 {{jsxref("TypedArray")}} 的實例，則永遠回傳 `false`。
+### 回傳值如果 `value` 為 {{jsxref("Array")}}，則回傳 `true`；否則回傳 `false`。如果 `value` 為 {{jsxref("TypedArray")}} 的實例，則永遠回傳 `false`。
 
 ## 描述
 
-`Array.isArray()` 檢查傳入的值是否為 {{jsxref("Array")}}。它會執行一種_品牌檢查（branded check）_，類似於 [`in`](/en-US/docs/Web/JavaScript/Reference/Operators/in) 運算子，檢查由 {{jsxref("Array/Array", "Array()")}} 建構子初始化的私有屬性。
+`Array.isArray()` 檢查傳入的值是否為 {{jsxref("Array")}}。它會執行一種_品牌檢查（branded check）_，類似於[`in`](/en-US/docs/Web/JavaScript/Reference/Operators/in)運算子，檢查由 {{jsxref("Array/Array", "Array()")}} 建構子初始化的私有屬性。
 
-這是一個比 [`instanceof Array`](/en-US/docs/Web/JavaScript/Reference/Operators/instanceof) 更穩健的替代方案，因為它可以避免誤判：
+這是一個比[`instanceof Array`](/en-US/docs/Web/JavaScript/Reference/Operators/instanceof)更穩健的替代方案，因為它可以避免誤判：
 
 - `Array.isArray()` 會拒絕不是 `Array` 實例的值，即使它們的 prototype 鏈中有 `Array.prototype` — `instanceof Array` 會接受這些值，因為它會檢查 prototype 鏈。
 - `Array.isArray()` 會接受在另一個 realm 中建構的 `Array` 物件 — `instanceof Array` 會為這些物件回傳 `false`，因為 `Array` 建構子的識別在不同的 realm 中是不同的。

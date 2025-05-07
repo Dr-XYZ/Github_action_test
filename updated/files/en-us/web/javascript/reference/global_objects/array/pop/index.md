@@ -50,7 +50,7 @@ pop()
 
 {{jsxref("Array.prototype.shift()")}} 具有與 `pop()` 相似的行為，但應用於陣列中的第一個元素。
 
-`pop()` 方法是一個變異（mutating）方法。它會變更 `this` 的長度和內容。如果你希望 `this` 的值保持不變，但回傳一個移除了最後一個元素的新陣列，則可以使用 [`arr.slice(0, -1)`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) 來代替。
+`pop()` 方法是一個變異（mutating）方法。它會變更 `this` 的長度和內容。如果你希望 `this` 的值保持不變，但回傳一個移除了最後一個元素的新陣列，則可以使用[`arr.slice(0, -1)`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)來代替。
 
 `pop()` 方法是[泛型的](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array#generic_array_methods)。它只需要 `this` 值具有 `length` 屬性和整數鍵屬性。雖然字串也是類陣列（array-like），但此方法不適合應用於它們，因為字串是不可變的（immutable）。
 

@@ -34,13 +34,11 @@ Array.of(element1, element2, /* …, */ elementN)
 - `element1`, …, `elementN`
   - : 用於建立陣列的元素。
 
-### 回傳值
-
-一個新的 {{jsxref("Array")}} 實例。
+### 回傳值一個新的 {{jsxref("Array")}} 實例。
 
 ## 描述
 
-`Array.of()` 與 [`Array()`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/Array) 建構子的差異在於處理單一引數的方式：`Array.of(7)` 建立一個包含單一元素 `7` 的陣列，而 `Array(7)` 建立一個 `length` 屬性為 `7` 的空陣列。（這意味著一個包含 7 個空欄位的陣列，而不是包含實際 {{jsxref("undefined")}} 值的欄位。）
+`Array.of()` 與[`Array()`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/Array)建構子的差異在於處理單一引數的方式：`Array.of(7)` 建立一個包含單一元素 `7` 的陣列，而 `Array(7)` 建立一個 `length` 屬性為 `7` 的空陣列。（這意味著一個包含 7 個空欄位的陣列，而不是包含實際 {{jsxref("undefined")}} 值的欄位。）
 
 ```js
 Array.of(7); // [7]

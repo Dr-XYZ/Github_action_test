@@ -8,17 +8,13 @@ browser-compat: javascript.builtins.Array.@@unscopables
 
 {{JSRef}}
 
-{{jsxref("Array.prototype")}} 的 **`[Symbol.unscopables]`** 資料屬性由所有 {{jsxref("Array")}} 實例共享。它包含 ES2015 版本之前未包含在 ECMAScript 標準中，且為了 [`with`](/zh-TW/docs/Web/JavaScript/Reference/Statements/with) 陳述式綁定目的而被忽略的屬性名稱。
+{{jsxref("Array.prototype")}} 的 **`[Symbol.unscopables]`** 資料屬性由所有 {{jsxref("Array")}} 實例共享。它包含 ES2015 版本之前未包含在 ECMAScript 標準中，且為了[`with`](/zh-TW/docs/Web/JavaScript/Reference/Statements/with)陳述式綁定目的而被忽略的屬性名稱。
 
-## 值
-
-具有下列屬性名稱且其值設定為 `true` 的 [`null`-prototype 物件](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Object#null-prototype_objects)。
+## 值具有下列屬性名稱且其值設定為 `true` 的 [`null`-prototype 物件](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Object#null-prototype_objects)。
 
 {{js_property_attributes(0, 0, 1)}}
 
-## 描述
-
-為了 `with` 陳述式綁定目的而被忽略的預設 `Array` 屬性為：
+## 描述為了 `with` 陳述式綁定目的而被忽略的預設 `Array` 屬性為：
 
 - [`at()`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/at)
 - [`copyWithin()`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin)
@@ -37,13 +33,11 @@ browser-compat: javascript.builtins.Array.@@unscopables
 - [`toSpliced()`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/toSpliced)
 - [`values()`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/values)
 
-`Array.prototype[Symbol.unscopables]` 是一個僅包含上述所有屬性名稱且值為 `true` 的空物件。它的[原型為 `null`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Object#null-prototype_objects)，因此像 [`toString`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Object/toString) 這樣的 `Object.prototype` 屬性不會意外地變成 unscopable，且 `with` 陳述式中的 `toString()` 將繼續在陣列上呼叫。
+`Array.prototype[Symbol.unscopables]` 是一個僅包含上述所有屬性名稱且值為 `true` 的空物件。它的[原型為 `null`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Object#null-prototype_objects)，因此像[`toString`](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Object/toString)這樣的 `Object.prototype` 屬性不會意外地變成 unscopable，且 `with` 陳述式中的 `toString()` 將繼續在陣列上呼叫。
 
 參見 {{jsxref("Symbol.unscopables")}} 以了解如何為你自己的物件設定 unscopable 屬性。
 
-## 範例
-
-假設下方的 `values.push('something')` 呼叫位於 ECMAScript 2015 之前編寫的程式碼中。
+## 範例假設下方的 `values.push('something')` 呼叫位於 ECMAScript 2015 之前編寫的程式碼中。
 
 ```js
 var values = [];

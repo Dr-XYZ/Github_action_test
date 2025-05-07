@@ -31,17 +31,11 @@ for (const key of iterator) {
 keys()
 ```
 
-### 參數
+### 參數無。
 
-無。
+### 回傳值一個新的[可迭代的迭代器物件](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Iterator)。
 
-### 回傳值
-
-一個新的[可迭代的迭代器物件](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Iterator)。
-
-## 描述
-
-當用於[稀疏陣列](/zh-TW/docs/Web/JavaScript/Guide/Indexed_collections#sparse_arrays)時，`keys()` 方法會迭代空插槽，如同它們具有 `undefined` 值一樣。
+## 描述當用於[稀疏陣列](/zh-TW/docs/Web/JavaScript/Guide/Indexed_collections#sparse_arrays)時，`keys()` 方法會迭代空插槽，如同它們具有 `undefined` 值一樣。
 
 `keys()` 方法是[泛用的](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array#generic_array_methods)。它只要求 `this` 值具有 `length` 屬性和整數鍵屬性。
 

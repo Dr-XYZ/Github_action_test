@@ -52,9 +52,7 @@ reduceRight(callbackFn, initialValue)
 - `initialValue` {{optional_inline}}
   - : 作為第一次呼叫 `callbackFn` 時累加器的值。如果沒有提供初始值，將會使用陣列中的最後一個元素並跳過。在沒有初始值的情況下，於空陣列上呼叫 `reduceRight()` 會建立一個 `TypeError`。
 
-### 回傳值
-
-縮減後產生的值。
+### 回傳值縮減後產生的值。
 
 ## 描述
 
@@ -66,13 +64,11 @@ reduceRight(callbackFn, initialValue)
 
 `reduceRight()` 方法是[泛用](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array#generic_array_methods)的。它只預期 `this` 值具有 `length` 屬性和整數鍵屬性。
 
-所有在 [何時不該使用 reduce()](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce#when_to_not_use_reduce) 中討論關於 `reduce` 的注意事項，同樣適用於 `reduceRight`。由於 JavaScript 沒有惰性求值語意，因此 `reduce` 和 `reduceRight` 之間沒有效能差異。
+所有在[何時不該使用 reduce()](/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce#when_to_not_use_reduce)中討論關於 `reduce` 的注意事項，同樣適用於 `reduceRight`。由於 JavaScript 沒有惰性求值語意，因此 `reduce` 和 `reduceRight` 之間沒有效能差異。
 
 ## 範例
 
-### 沒有初始值時 reduceRight() 的運作方式
-
-對 reduceRight `callbackFn` 的呼叫看起來會像這樣：
+### 沒有初始值時 reduceRight() 的運作方式對 reduceRight `callbackFn` 的呼叫看起來會像這樣：
 
 ```js
 arr.reduceRight((accumulator, currentValue, index, array) => {
@@ -103,9 +99,7 @@ arr.reduceRight((accumulator, currentValue, index, array) => {
 
 `array` 參數在整個過程中永遠不會改變，它永遠是 `[0, 1, 2, 3, 4]`。`reduceRight` 傳回的值會是最後一次回呼呼叫的值（`10`）。
 
-### 使用初始值時 reduceRight() 的運作方式
-
-在這裡，我們使用相同的演算法縮減相同的陣列，但將 `10` 的 `initialValue` 作為第二個引數傳遞給 `reduceRight()`：
+### 使用初始值時 reduceRight() 的運作方式在這裡，我們使用相同的演算法縮減相同的陣列，但將 `10` 的 `initialValue` 作為第二個引數傳遞給 `reduceRight()`：
 
 ```js
 [0, 1, 2, 3, 4].reduceRight(
@@ -194,9 +188,7 @@ console.log(left); // "12345"
 console.log(right); // "54321"
 ```
 
-### 定義可組合的函式
-
-函式組合是一種組合函式的機制，其中每個函式的輸出會傳遞到下一個函式，而最後一個函式的輸出是最終結果。在這個範例中，我們使用 `reduceRight()` 來實作函式組合。
+### 定義可組合的函式函式組合是一種組合函式的機制，其中每個函式的輸出會傳遞到下一個函式，而最後一個函式的輸出是最終結果。在這個範例中，我們使用 `reduceRight()` 來實作函式組合。
 
 另請參閱 Wikipedia 上的[函式組合](<https://en.wikipedia.org/wiki/Function_composition_(computer_science)>)。
 
