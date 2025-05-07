@@ -24,12 +24,14 @@ jobs:
       - name: Get the list of changed .md files
         id: get_files
         run: |
-          # 確認兩個提交 SHA 是否有效，若沒有（如首次提交），就使用 HEAD
+          # 檢查是否為首次提交，若是首次提交，使用 HEAD，否則使用 before 和 sha 進行比較
           if [[ -z "${{ github.event.before }}" || "${{ github.event.before }}" == "0000000000000000000000000000000000000000" ]]; then
-            # 若是首次提交，直接對比 HEAD
+            # 首次提交，對比 HEAD
+            echo "首次提交，使用 HEAD 進行比較"
             files=$(git diff --name-only HEAD | grep '\.md$')
           else
             # 正常情況，對比上次提交與當前提交
+            echo "正常提交，對比 ${{ github.event.before }} 和 ${{ github.sha }}"
             files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.md$')
           fi
           echo "changed_files=$files" >> $GITHUB_ENV
@@ -39,17 +41,17 @@ jobs:
           # 逐一修正變更過的 Markdown 檔案
           for file in ${{ env.changed_files }}; do
             echo "Fixing spacing in $file"
-            python .github/scripts/fix_spacing.py $file
+            python fix_spacing.py $file
           done
 
       - name: Commit and push changes
         run: |
-          git config user.name "dr-xyz"
-          git config user.email "dr.xyz.tw@gmail.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "auto-fix spacing"
+            git commit -m "chore: auto-fix spacing in Markdown files"
             git push
           fi
