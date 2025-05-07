@@ -6,7 +6,7 @@
 
 也有一些像這樣的 例子：處理 [inlineTest](https://example.com) 時需要注意。
 
-另一種情 況是 [功能測試 Test](https://example.com) 應該正確處理。
+另一種情況是 [功能測試 Test](https://example.com) 應該正確處理。
 
 還有像這樣中文夾雜空 格的例子。
 
