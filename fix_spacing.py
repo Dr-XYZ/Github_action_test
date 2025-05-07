@@ -4,7 +4,7 @@ import os
 
 import re
 
-def spacing(text):
+def fix_spacing(text):
     # 1. 刪除中文字+[中文字之間的多餘空格
     text = re.sub(r'([\u4e00-\u9fff])\s+\[([\u4e00-\u9fff])', r'\1[\2', text)
 
