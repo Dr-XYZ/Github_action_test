@@ -24,11 +24,19 @@ jobs:
       - name: Get the list of changed .md files
         id: get_files
         run: |
-          files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.md$')
+          # 確認兩個提交 SHA 是否有效，若沒有（如首次提交），就使用 HEAD
+          if [[ -z "${{ github.event.before }}" || "${{ github.event.before }}" == "0000000000000000000000000000000000000000" ]]; then
+            # 若是首次提交，直接對比 HEAD
+            files=$(git diff --name-only HEAD | grep '\.md$')
+          else
+            # 正常情況，對比上次提交與當前提交
+            files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.md$')
+          fi
           echo "changed_files=$files" >> $GITHUB_ENV
 
       - name: Run spacing fixer on changed files
         run: |
+          # 逐一修正變更過的 Markdown 檔案
           for file in ${{ env.changed_files }}; do
             echo "Fixing spacing in $file"
             python .github/scripts/fix_spacing.py $file
