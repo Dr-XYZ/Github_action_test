@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 拉取完整的 commit history
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -24,33 +26,17 @@ jobs:
       - name: Get the list of changed .md files
         id: get_files
         run: |
-          # 檢查是否為首次提交，若是首次提交，使用 HEAD，否則使用 before 和 sha 進行比較
-          if [[ -z "${{ github.event.before }}" || "${{ github.event.before }}" == "0000000000000000000000000000000000000000" ]]; then
-            # 首次提交，對比 HEAD
-            echo "首次提交，使用 HEAD 進行比較"
-            files=$(git diff --name-only HEAD | grep '\.md$')
-          else
-            # 正常情況，對比上次提交與當前提交
-            echo "正常提交，對比 ${{ github.event.before }} 和 ${{ github.sha }}"
-            base_commit=$(git merge-base ${{ github.event.before }} ${{ github.sha }})
-            files=$(git diff --name-only $base_commit ${{ github.sha }} | grep '\.md$')
-          fi
+          files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.md$')
           echo "changed_files=$files" >> $GITHUB_ENV
 
       - name: Run spacing fixer on changed files
         run: |
-          # 逐一修正變更過的 Markdown 檔案
           for file in ${{ env.changed_files }}; do
             echo "Fixing spacing in $file"
             python fix_spacing.py $file
           done
 
-      - name: Create a new branch for fixes
-        run: |
-          # 創建新分支，避免影響原本的分支
-          git checkout -b fix-spacing-branch
-
-      - name: Commit the changes to the new branch
+      - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -59,18 +45,5 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "chore: auto-fix spacing in Markdown files"
+            git push
           fi
-
-      - name: Push the new branch to the repository
-        run: |
-          git push origin fix-spacing-branch
-
-      - name: Create a Pull Request
-        uses: peter-evans/create-pull-request@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: main  # 將 PR 合併到 main 分支
-          head: fix-spacing-branch
-          title: "Auto-fix: Fix spacing in Markdown files"
-          body: "This PR auto-fixes the spacing issues in Markdown files."
-
