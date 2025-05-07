@@ -4,11 +4,11 @@
 
 這是一段包含中英文字的例子：我們將test 這個字放在中文中間。
 
-也有一些像這樣的例子：處理[inlineTest](https://example.com) 時需要注意。
+也有一些像這樣的例子：處理 [inlineTest](https://example.com) 時需要注意。
 
-另一種情況是[功能測試 Test](https://example.com) 應該正確處理。
+另一種情況是 [功能測試 Test](https://example.com) 應該正確處理。
 
-還有像這樣中文夾雜空格的例子。
+還有像這樣中文夾雜空 格的例子。
 
 或是多個中文 中間有 多餘空格。
 
