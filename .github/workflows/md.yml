@@ -31,8 +31,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          git config user.name "你的GitHub用戶名"
-          git config user.email "你的Email"
+          git config user.name "dr-xyz"
+          git config user.email "dr.xyz.tw@gmail.com"
           git add '*.md'
           git diff --cached --quiet || git commit -m "fix: 自動修正 Markdown 格式（中英空格與中中間距）"
           git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
