@@ -12,4 +12,5 @@
 
 或是多個中文中間有 多餘空格。
 
-最後是這樣 一段有點亂的：請點擊[linkHere 中文 Test 測試](https://example.com/page) 來看結果。
+最後是這樣 一段有點亂的：請 點擊[linkHere 中文 Test 測試](https://example.com/page) 來看結果。
+
