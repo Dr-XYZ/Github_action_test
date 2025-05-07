@@ -32,7 +32,8 @@ jobs:
           else
             # 正常情況，對比上次提交與當前提交
             echo "正常提交，對比 ${{ github.event.before }} 和 ${{ github.sha }}"
-            files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.md$')
+            base_commit=$(git merge-base ${{ github.event.before }} ${{ github.sha }})
+            files=$(git diff --name-only $base_commit ${{ github.sha }} | grep '\.md$')
           fi
           echo "changed_files=$files" >> $GITHUB_ENV
 
@@ -44,7 +45,12 @@ jobs:
             python fix_spacing.py $file
           done
 
-      - name: Commit and push changes
+      - name: Create a new branch for fixes
+        run: |
+          # 創建新分支，避免影響原本的分支
+          git checkout -b fix-spacing-branch
+
+      - name: Commit the changes to the new branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -53,5 +59,18 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "chore: auto-fix spacing in Markdown files"
-            git push
           fi
+
+      - name: Push the new branch to the repository
+        run: |
+          git push origin fix-spacing-branch
+
+      - name: Create a Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main  # 將 PR 合併到 main 分支
+          head: fix-spacing-branch
+          title: "Auto-fix: Fix spacing in Markdown files"
+          body: "This PR auto-fixes the spacing issues in Markdown files."
+
