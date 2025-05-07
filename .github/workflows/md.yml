@@ -1,0 +1,38 @@
+name: Fix Markdown Format
+
+on:
+  push:
+    paths:
+      - '**/*.md'
+  pull_request:
+    paths:
+      - '**/*.md'
+
+jobs:
+  fix-markdown:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install --upgrade pip
+
+      - name: Run Markdown fixer
+        run: python fix_markdown.py
+
+      - name: Commit changes with user identity
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          git config user.name "你的GitHub用戶名"
+          git config user.email "你的Email"
+          git add '*.md'
+          git diff --cached --quiet || git commit -m "fix: 自動修正 Markdown 格式（中英空格與中中間距）"
+          git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
