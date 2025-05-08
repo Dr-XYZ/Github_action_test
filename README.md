@@ -54,14 +54,14 @@ page-type: guide
       圖片 1：無 height、width 或 style
       <img
         id="image1"
-        src="[https://www.mozilla.org/images/mozilla-banner.gif](https://www.mozilla.org/images/mozilla-banner.gif)" />
+        src=" [https://www.mozilla.org/images/mozilla-banner.gif](https://www.mozilla.org/images/mozilla-banner.gif) " />
     </p>
 
     <p>
       圖片 2：height="50"、width="500"，但無 style
       <img
         id="image2"
-        src="[https://www.mozilla.org/images/mozilla-banner.gif](https://www.mozilla.org/images/mozilla-banner.gif)"
+        src=" [https://www.mozilla.org/images/mozilla-banner.gif](https://www.mozilla.org/images/mozilla-banner.gif) "
         height="50"
         width="500" />
     </p>
@@ -70,7 +70,7 @@ page-type: guide
       圖片 3：無 height、width，但 style="height: 50px; width: 500px;"
       <img
         id="image3"
-        src="[https://www.mozilla.org/images/mozilla-banner.gif](https://www.mozilla.org/images/mozilla-banner.gif)"
+        src=" [https://www.mozilla.org/images/mozilla-banner.gif](https://www.mozilla.org/images/mozilla-banner.gif) "
         style="height: 50px; width: 500px;" />
     </p>
 
@@ -139,7 +139,7 @@ page-type: guide
     </script>
   </head>
   <body>
-    <p id="pid" onclick="window.location.href = '[http://www.cnn.com/](http://www.cnn.com/)';">
+    <p id="pid" onclick="window.location.href = ' [http://www.cnn.com/](http://www.cnn.com/) ';">
       連結器
     </p>
 
@@ -306,7 +306,7 @@ P
 
 ## 範例 7：顯示事件物件屬性
 
-此範例使用 DOM 方法將 {{domxref("Window.load_event", "onload")}} {{domxref("event")}} 物件的所有屬性及其值顯示在表格中。它也展示了一種使用 [`for...in`](/zh-TW/docs/Web/JavaScript/Reference/Statements/for...in) 迴圈來迭代物件屬性以取得其值的實用技巧。
+此範例使用 DOM 方法將 {{domxref("Window.load_event", "onload")}}  {{domxref("event")}} 物件的所有屬性及其值顯示在表格中。它也展示了一種使用 [`for...in`](/zh-TW/docs/Web/JavaScript/Reference/Statements/for...in) 迴圈來迭代物件屬性以取得其值的實用技巧。
 
 事件物件的屬性在不同瀏覽器之間差異很大，[WHATWG DOM Standard](https://dom.spec.whatwg.org/) 列出了標準屬性，但許多瀏覽器已大幅擴展了這些屬性。
 
