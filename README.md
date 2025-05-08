@@ -11,7 +11,7 @@ DOM 用邏輯樹來表示文件。樹的每個分支都終止於一個節點，�
 
 節點也可以附加事件處理器。事件觸發後，事件處理器便會執行。
 
-若要深入了解 DOM 是什麼以及它如何表示文件，請參閱我們的文章 [DOM 簡介](/zh-TW/docs/Web/API/Document_Object_Model/Introduction)。
+若要深入了解 DOM 是什麼以及它如何表示文件，參見我們的文章 [DOM 簡介](/zh-TW/docs/Web/API/Document_Object_Model/Introduction)。
 
 ## DOM 介面
 
@@ -56,7 +56,7 @@ DOM 用邏輯樹來表示文件。樹的每個分支都終止於一個節點，�
 
 ### 已棄用的 DOM 介面
 
-文件物件模型已經被高度簡化。為了達到此目的，不同 DOM Level 3 或更早期的規範中的以下介面已被移除。它們不再對網頁開發人員可用。
+文件物件模型已經被高度簡化。為了達到此目的，不同 DOM Level 3 或更早期的規範中的以下介面已被移除。它們不再對 Web 開發人員可用。
 
 - `DOMConfiguration`
 - `DOMErrorHandler`
@@ -77,13 +77,13 @@ DOM 用邏輯樹來表示文件。樹的每個分支都終止於一個節點，�
 
 ## HTML DOM
 
-包含 HTML 的文件使用 {{DOMxRef("Document")}} 介面來描述，HTML 規範擴展了此介面以包含各種 HTML 特有的功能。特別是，{{domxref("Element")}} 介面被增強為 {{domxref("HTMLElement")}} 和各種子類別，每個子類別代表一個（或一族密切相關的）元素。
+包含 HTML 的文件使用 {{DOMxRef("Document")}} 介面來描述，HTML 規範擴展了此介面以包含各種 HTML 特有的功能。特別是 {{domxref("Element")}} 介面被增強為 {{domxref("HTMLElement")}} 和各種子類別，每個子類別代表一個（或一族密切相關的）元素。
 
 HTML DOM API 提供了對各種瀏覽器功能的存取，例如分頁與視窗、CSS 樣式與樣式表、瀏覽器歷史記錄等。這些介面在 [HTML DOM API](/zh-TW/docs/Web/API/HTML_DOM_API) 文件中會進一步討論。
 
 ## SVG DOM
 
-類似地，包含 SVG 的文件也使用 {{DOMxRef("Document")}} 介面來描述，SVG 規範擴展了此介面以包含各種 SVG 特有的功能。特別是，{{domxref("Element")}} 介面被增強為 {{domxref("SVGElement")}} 和各種子類別，每個子類別代表一個或一族密切相關的元素。這些介面在 [SVG API](/zh-TW/docs/Web/API/SVG_API) 文件中會進一步討論。
+類似地，包含 SVG 的文件也使用 {{DOMxRef("Document")}} 介面來描述，SVG 規範擴展了此介面以包含各種 SVG 特有的功能。特別是 {{domxref("Element")}} 介面被增強為 {{domxref("SVGElement")}} 和各種子類別，每個子類別代表一個或一族密切相關的元素。這些介面在 [SVG API](/zh-TW/docs/Web/API/SVG_API) 文件中會進一步討論。
 
 ## 規範
 
