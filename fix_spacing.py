@@ -2,7 +2,13 @@ import re
 import sys
 
 def is_chinese(char):
-    return '\u4e00' <= char <= '\u9fff'
+    if char == '`':
+        return False
+    return (
+        '\u4e00' <= char <= '\u9fff' or  # 中文文字
+        '\u3000' <= char <= '\u303f' or  # 中文標點（如「、。」等）
+        char == '\uff0c'                 # 中文逗號（，）
+    )
 
 def extract_param(macro):
     match = re.match(r'{{.*?\("([^"]+)"(?:,\s*"([^"]*)")?\)}}', macro)
