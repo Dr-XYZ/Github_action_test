@@ -7,13 +7,13 @@ l10n:
 
 {{ApiRef("DOM")}}
 
-{{domxref("Document")}} 的 **`querySelector()`** 方法回傳文件中第一個符合指定[CSS 選擇器](/zh-TW/docs/Web/CSS/CSS_selectors)或一組 CSS 選擇器的 {{domxref("Element")}}。如果沒有找到匹配項，則回傳 `null`。
+{{domxref("Document")}} 的 **`querySelector()`** 方法回傳文件中第一個符合指定 [CSS 選擇器](/zh-TW/docs/Web/CSS/CSS_selectors)或一組 CSS 選擇器的 {{domxref("Element")}}。如果沒有找到匹配項，則回傳 `null`。
 
 匹配是通過從文件節點的第一個元素開始，使用深度優先的先序遍歷進行的，並按照子節點數量的順序依次迭代。
 
 如果指定的選擇器匹配了在文件中被錯誤多次使用的 ID，則回傳具有該 ID 的第一個元素。
 
-根據 [Selectors API](https://www.w3.org/TR/selectors-api/#grammar) 規範，[CSS 偽元素](/zh-TW/docs/Web/CSS/Pseudo-elements)永遠不會回傳任何元素。
+根據 [Selectors API](https://www.w3.org/TR/selectors-api/#grammar) 規範，[CSS 偽元素](/zh-TW/docs/Web/CSS/Pseudo-elements) 永遠不會回傳任何元素。
 
 ## 語法
 
@@ -27,11 +27,9 @@ querySelector(selectors)
 
   - : 包含一個或多個選擇器的字串。此字串必須是有效的 CSS 選擇器字串；如果不是，則會拋出 `SyntaxError` 例外。
 
-    注意 HTML 規範並不要求屬性值是有效的 CSS 識別符。如果 [`class`](/zh-TW/docs/Web/HTML/Reference/Global_attributes/class) 或 [`id`](/zh-TW/docs/Web/HTML/Reference/Global_attributes/id) 屬性值不是有效的 CSS 識別符，那麼在選擇器中使用它之前，你必須對其進行轉義，可以通過呼叫 {{domxref("CSS.escape_static", "CSS.escape()")}} 或使用 [轉義字元](/zh-TW/docs/Web/CSS/ident#轉義字元) 中描述的技術之一進行轉義。參見[轉義屬性值](#轉義屬性值)範例。
+    注意 HTML 規範並不要求屬性值是有效的 CSS 識別符。如果 [`class`](/zh-TW/docs/Web/HTML/Reference/Global_attributes/class) 或 [`id`](/zh-TW/docs/Web/HTML/Reference/Global_attributes/id) 屬性值不是有效的 CSS 識別符，那麼在選擇器中使用它之前，你必須對其進行轉義，可以通過呼叫 {{domxref("CSS.escape_static", "CSS.escape()")}} 或使用[轉義字元](/zh-TW/docs/Web/CSS/ident#轉義字元)中描述的技術之一進行轉義。參見[轉義屬性值](#轉義屬性值)範例。
 
-### 回傳值
-
-一個 {{domxref("Element")}} 物件，表示文件中第一個符合指定[CSS 選擇器](/zh-TW/docs/Web/CSS/CSS_selectors)的元素；如果沒有匹配項，則回傳 `null`。
+### 回傳值一個 {{domxref("Element")}} 物件，表示文件中第一個符合指定 [CSS 選擇器](/zh-TW/docs/Web/CSS/CSS_selectors)的元素；如果沒有匹配項，則回傳 `null`。
 
 如果你需要符合指定選擇器的所有元素的清單，應該使用 {{domxref("Document.querySelectorAll", "querySelectorAll()")}}。
 
@@ -42,25 +40,19 @@ querySelector(selectors)
 
 ## 範例
 
-### 查找匹配類別的第一個元素
-
-在此範例中，回傳文件中第一個具有類別 `myclass` 的元素：
+### 查找匹配類別的第一個元素在此範例中，回傳文件中第一個具有類別 `myclass` 的元素：
 
 ```js
 const el = document.querySelector(".myclass");
 ```
 
-### 複雜選擇器
-
-選擇器也可以非常強大，如以下範例所示。這裡，回傳文件中位於類別為 `user-panel main` 的 {{HTMLElement("div")}}（`<div class="user-panel main">`）內，名稱為 `login` 的第一個 {{HTMLElement("input")}} 元素（`<input name="login"/>`）：
+### 複雜選擇器選擇器也可以非常強大，如以下範例所示。這裡，回傳文件中位於類別為 `user-panel main` 的 {{HTMLElement("div")}}（`<div class="user-panel main">`）內，名稱為 `login` 的第一個 {{HTMLElement("input")}} 元素（`<input name="login"/>`）：
 
 ```js
 const el = document.querySelector("div.user-panel.main input[name='login']");
 ```
 
-### 反向
-
-由於所有 CSS 選擇器字串都是有效的，你也可以反向選擇器：
+### 反向由於所有 CSS 選擇器字串都是有效的，你也可以反向選擇器：
 
 ```js
 const el = document.querySelector(
@@ -70,13 +62,9 @@ const el = document.querySelector(
 
 這將選擇一個父元素為具有 `user-panel` 類別但沒有 `main` 類別的 `div` 的輸入元素。
 
-### 轉義屬性值
+### 轉義屬性值此範例顯示，如果 HTML 文件包含一個不是有效的 [CSS 識別符](/zh-TW/docs/Web/CSS/ident)的 [`id`](/zh-TW/docs/Web/HTML/Reference/Global_attributes/id)，那麼在 `querySelector()` 中使用它之前，我們必須對屬性值進行轉義。
 
-此範例顯示，如果 HTML 文件包含一個不是有效的 [CSS 識別符](/zh-TW/docs/Web/CSS/ident) 的 [`id`](/zh-TW/docs/Web/HTML/Reference/Global_attributes/id)，那麼在 `querySelector()` 中使用它之前，我們必須對屬性值進行轉義。
-
-#### HTML
-
-在以下程式碼中，一個 {{htmlelement("div")}} 元素的 `id` 是 `"this?element"`，這不是有效的 CSS 識別符，因為 `"?"` 字元在 CSS 識別符中不被允許。
+#### HTML 在以下程式碼中，一個 {{htmlelement("div")}} 元素的 `id` 是 `"this?element"`，這不是有效的 CSS 識別符，因為 `"?"` 字元在 CSS 識別符中不被允許。
 
 我們還有三個按鈕和一個用於記錄錯誤的 {{htmlelement("pre")}} 元素。
 
@@ -101,9 +89,7 @@ div {
 }
 ```
 
-#### JavaScript
-
-當點擊這三個按鈕時，它們都會嘗試選擇 `<div>`，然後將其背景顏色設定為隨機值。
+#### JavaScript 當點擊這三個按鈕時，它們都會嘗試選擇 `<div>`，然後將其背景顏色設定為隨機值。
 
 - 第一個按鈕直接使用 `"this?element"` 值。
 - 第二個按鈕使用 {{domxref("CSS.escape_static", "CSS.escape()")}} 對值進行轉義。
@@ -141,9 +127,7 @@ document.querySelector("#manual-escape").addEventListener("click", () => {
 });
 ```
 
-#### 結果
-
-點擊第一個按鈕會產生錯誤，而第二個和第三個按鈕則能正常工作。
+#### 結果點擊第一個按鈕會產生錯誤，而第二個和第三個按鈕則能正常工作。
 
 {{embedlivesample("轉義屬性值", "", 200)}}
 
