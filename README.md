@@ -1,12 +1,12 @@
 ---
-title: 使用 DOM 進行網頁與 XML 開發的範例
+title: 使用 DOM 進行 Web 與 XML 開發的範例
 slug: Web/API/Document_Object_Model/Examples
 page-type: guide
 ---
 
 {{DefaultAPISidebar("DOM")}}
 
-本章提供一些較長的使用 DOM 進行網頁與 XML 開發的範例。在可行情況下，這些範例使用 JavaScript 中常見的 API、技巧及模式來操作 document 物件。
+本章提供一些較常的使用 DOM 進行 Web 與 XML 開發的範例。在可行情況下，這些範例使用 JavaScript 中常見的 API、技巧及模式來操作 document 物件。
 
 ## 範例 1：height 與 width
 
@@ -14,7 +14,7 @@ page-type: guide
 
 ```html
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant-TW">
   <head>
     <title>width/height 範例</title>
     <script>
@@ -83,7 +83,7 @@ page-type: guide
 
 ```html
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant-TW">
   <head>
     <title>修改圖片邊框</title>
 
@@ -125,7 +125,7 @@ page-type: guide
 
 ```html
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant-TW">
   <head>
     <title>更改顏色與字體大小範例</title>
 
@@ -196,7 +196,7 @@ P
 
 ```html
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant-TW">
   <head>
     <title>事件傳播</title>
 
@@ -247,7 +247,7 @@ P
 
 ```html
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant-TW">
   <head>
     <title>getComputedStyle 範例</title>
 
@@ -314,7 +314,7 @@ P
 
 ```html
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant-TW">
   <head>
     <meta charset="utf-8" />
     <title>顯示事件屬性</title>
