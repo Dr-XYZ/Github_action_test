@@ -7,10 +7,9 @@ l10n:
 
 {{APIRef}}
 
-**`scroll`** 事件會在文件視圖被捲動時觸發。  
-若要檢測捲動何時完成，請參見 `Document` 的 {{domxref("Document/scrollend_event", "scrollend")}} 事件。  
-若是元素的捲動，請參見 `Element` 的 {{domxref("Element/scroll_event", "scroll")}} 事件。
+scroll 事件會在文件視區被捲動時觸發。若要偵測捲動已完成的時機，請參閱 Document 的 {{domxref(“Document/scrollend_event”, “scrollend”)}} 事件。若是元素的捲動，請參閱 Element 的 {{domxref(“Element/scroll_event”, “scroll”)}} 事件。
 
+你需要我幫你檢查整體語氣是否符合 MDN 翻譯風格嗎？
 ## 語法
 
 在方法中使用事件名稱，例如 {{domxref("EventTarget.addEventListener", "addEventListener()")}}，或設定事件處理屬性。
