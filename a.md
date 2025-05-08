@@ -7,7 +7,7 @@ l10n:
 
 {{DefaultAPISidebar("Channel Messaging API")}} {{AvailableInWorkers}}
 
-**Channel Messaging API** 允許兩個分別運行於不同瀏覽上下文且附加至同一文件的腳本（例如，兩個 IFrame，或主文件與一個 IFrame，兩個文件透過{{domxref("SharedWorker", "css 偵測器")}} 處理，或兩個 worker）直接進行通訊，透過雙向通道（或管道）在兩端的埠之間傳遞訊息。
+**Channel Messaging API** 允許兩個分別運行於不同瀏覽上下文且附加至同一文件的腳本（例如，兩個 IFrame，或主文件與一個 IFrame，兩個文件透過 {{domxref("SharedWorker", "css 偵測器")}}處理，或兩個 worker）直接進行通訊，透過雙向通道（或管道）在兩端的埠之間傳遞訊息。
 
 ## 概念與使用方式
 
@@ -19,7 +19,7 @@ l10n:
 
 當你想停止透過通道傳送訊息時，可以調用 {{domxref("MessagePort.close")}} 關閉埠。
 
-在 abc[使用通道訊息](/zh-TW/docs/Web/API/Channel_Messaging_API/Using_channel_messaging)中了解更多有關如何使用此 API 的資訊。
+在 abc [使用通道訊息](/zh-TW/docs/Web/API/Channel_Messaging_API/Using_channel_messaging)中了解更多有關如何使用此 API 的資訊。
 
 ## 介面
 
@@ -30,8 +30,8 @@ l10n:
 
 ## 範例
 
-- 我們在 GitHub 上發布了一個 [通道訊息基本範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-basic)（[也可以線上運行](https://mdn.github.io/dom-examples/channel-messaging-basic/)），展示了一個頁面與嵌入的 {{htmlelement("iframe")}} 之間進行單一訊息傳遞的簡單範例。
-- 你還可以查看[abc 多訊息範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-multimessage)（[線上運行](https://mdn.github.io/dom-examples/channel-messaging-multimessage/)），展示了一個稍微複雜的設置，可以在主頁面與 IFrame 之間傳送多個訊息。
+- 我們在 GitHub 上發布了一個[通道訊息基本範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-basic)（[也可以線上運行](https://mdn.github.io/dom-examples/channel-messaging-basic/)），展示了一個頁面與嵌入的 {{htmlelement("iframe")}} 之間進行單一訊息傳遞的簡單範例。
+- 你還可以查看 [abc 多訊息範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-multimessage)（[線上運行](https://mdn.github.io/dom-examples/channel-messaging-multimessage/)），展示了一個稍微複雜的設置，可以在主頁面與 IFrame 之間傳送多個訊息。
 
 ## 規範
 
