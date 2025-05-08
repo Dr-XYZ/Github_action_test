@@ -1,6 +1,6 @@
 ---
 title: Channel Messaging API
-slug: Web/API/Channel_Messaging_AP
+slug: Web/API/Channel_Messaging_API
 l10n:
   sourceCommit: 2c641e08878722bf29fb784d58c61873ce4a133a
 ---
@@ -19,16 +19,18 @@ l10n:
 
 當你想停止透過通道傳送訊息時，可以調用 {{domxref("MessagePort.close")}} 關閉埠。
 
-在 abc [使用通道訊息](/zh-TW/docs/Web/API/Channel_Messaging_API/Using_channel_messaging)中了解更多有關如何使用此 API 的資訊。
+在[使用通道訊息](/zh-TW/docs/Web/API/Channel_Messaging_API/Using_channel_messaging)中了解更多有關如何使用此 API 的資訊。
 
 ## 介面
 
-- {{domxref("MessageChannel")}}  - : 建立一個新的訊息通道以傳送訊息。
-- {{domxref("MessagePort")}}  - : 控制訊息通道上的埠，允許從一個埠發送訊息並監聽另一個埠接收訊息。
+- {{domxref("MessageChannel")}}
+  - : 建立一個新的訊息通道以傳送訊息。
+- {{domxref("MessagePort")}}
+  - : 控制訊息通道上的埠，允許從一個埠發送訊息並監聽另一個埠接收訊息。
 
 ## 範例
 
-- 我們在 GitHub 上發布了一個 [chandl 通道訊息基本範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-basic)（[也可以線上運行](https://mdn.github.io/dom-examples/channel-messaging-basic/)），展示了一個頁面與嵌入的 {{htmlelement("iframe")}} 之間進行單一訊息傳遞的簡單範例。
+- 我們在 GitHub 上發布了一個[通道訊息基本範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-basic)（[也可以線上運行](https://mdn.github.io/dom-examples/channel-messaging-basic/)），展示了一個頁面與嵌入的 {{htmlelement("iframe")}} 之間進行單一訊息傳遞的簡單範例。
 - 你還可以查看[多訊息範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-multimessage)（[線上運行](https://mdn.github.io/dom-examples/channel-messaging-multimessage/)），展示了一個稍微複雜的設置，可以在主頁面與 IFrame 之間傳送多個訊息。
 
 ## 規範
@@ -41,4 +43,6 @@ l10n:
 
 ## 參見
 
-- [使用通道訊息](/zh-TW/docs/Web/API/Channel_Messaging_API/Using_channel_messaging)- [Web Workers API](/zh-TW/docs/Web/API/Web_Workers_API)- [Broadcast Channel API](/zh-TW/docs/Web/API/Broadcast_Channel_API)
+- [使用通道訊息](/zh-TW/docs/Web/API/Channel_Messaging_API/Using_channel_messaging)
+- [Web Workers API](/zh-TW/docs/Web/API/Web_Workers_API)
+- [Broadcast Channel API](/zh-TW/docs/Web/API/Broadcast_Channel_API)
