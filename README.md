@@ -1,21 +1,21 @@
 ---
-title: 文件物件模型 (DOM)
+title: Document Object Model (DOM)
 slug: Web/API/Document_Object_Model
-l10n:
-  sourceCommit: df2a728b3b3911a396a4b47d363e4a335a5c8065
+page-type: web-api-overview
+spec-urls: https://dom.spec.whatwg.org/
 ---
 
 {{DefaultAPISidebar("DOM")}}
 
-**文件物件模型**（**DOM**）將文件的結構（例如代表網頁的 HTML）表示在記憶體中，以此連接網頁到腳本或程式設計語言。通常是指 JavaScript，儘管將 HTML、SVG 或 XML 文件模型化為物件並非 JavaScript 語言核心的一部分。
+The **Document Object Model** (**DOM**) connects web pages to scripts or programming languages by representing the structure of a document—such as the HTML representing a web page—in memory. Usually it refers to JavaScript, even though modeling HTML, SVG, or XML documents as objects are not part of the core JavaScript language.
 
-DOM 用邏輯樹來表示文件。樹的每個分支都終止於一個節點，每個節點都包含物件。DOM 方法允許以程式設計方式存取樹。藉由這些方法，你可以更改文件的結構、樣式或內容。
+The DOM represents a document with a logical tree. Each branch of the tree ends in a node, and each node contains objects. DOM methods allow programmatic access to the tree. With them, you can change the document's structure, style, or content.
 
-節點也可以附加事件處理器。事件觸發後，事件處理器便會執行。
+Nodes can also have event handlers attached to them. Once an event is triggered, the event handlers get executed.
 
-若要深入了解 DOM 是什麼以及它如何表示文件，參見我們的文章 [DOM 簡介](/zh-TW/docs/Web/API/Document_Object_Model/Introduction)。
+To learn more about what the DOM is and how it represents documents, see our article [Introduction to the DOM](/en-US/docs/Web/API/Document_Object_Model/Introduction).
 
-## DOM 介面
+## DOM interfaces
 
 - {{DOMxRef("AbortController")}}
 - {{DOMxRef("AbortSignal")}}
@@ -56,9 +56,9 @@ DOM 用邏輯樹來表示文件。樹的每個分支都終止於一個節點，�
 - {{DOMxRef("TreeWalker")}}
 - {{DOMxRef("XMLDocument")}}
 
-### 已棄用的 DOM 介面
+### Obsolete DOM interfaces
 
-文件物件模型已經被高度簡化。為了達到此目的，不同 DOM Level 3 或更早期的規範中的以下介面已被移除。它們不再對 Web 開發人員可用。
+The Document Object Model has been highly simplified. To achieve this, the following interfaces in the different DOM level 3 or earlier specifications have been removed. They are no longer available to web developers.
 
 - `DOMConfiguration`
 - `DOMErrorHandler`
@@ -79,19 +79,19 @@ DOM 用邏輯樹來表示文件。樹的每個分支都終止於一個節點，�
 
 ## HTML DOM
 
-包含 HTML 的文件使用 {{DOMxRef("Document")}} 介面來描述，HTML 規範擴展了此介面以包含各種 HTML 特有的功能。特別是 {{domxref("Element")}} 介面被增強為 {{domxref("HTMLElement")}} 和各種子類別，每個子類別代表一個（或一族密切相關的）元素。
+A document containing HTML is described using the {{DOMxRef("Document")}} interface, which is extended by the HTML specification to include various HTML-specific features. In particular, the {{domxref("Element")}} interface is enhanced to become {{domxref("HTMLElement")}} and various subclasses, each representing one of (or a family of closely related) elements.
 
-HTML DOM API 提供了對各種瀏覽器功能的存取，例如分頁與視窗、CSS 樣式與樣式表、瀏覽器歷史記錄等。這些介面在 [HTML DOM API](/zh-TW/docs/Web/API/HTML_DOM_API) 文件中會進一步討論。
+The HTML DOM API provides access to various browser features such as tabs and windows, CSS styles and stylesheets, browser history, etc. These interfaces are discussed further in the [HTML DOM API](/en-US/docs/Web/API/HTML_DOM_API) documentation.
 
 ## SVG DOM
 
-類似地，包含 SVG 的文件也使用 {{DOMxRef("Document")}} 介面來描述，SVG 規範擴展了此介面以包含各種 SVG 特有的功能。特別是 {{domxref("Element")}} 介面被增強為 {{domxref("SVGElement")}} 和各種子類別，每個子類別代表一個或一族密切相關的元素。這些介面在 [SVG API](/zh-TW/docs/Web/API/SVG_API) 文件中會進一步討論。
+Similarly, a document containing SVG is also described using the {{DOMxRef("Document")}} interface, which is extended by the SVG specification to include various SVG-specific features. In particular, the {{domxref("Element")}} interface is enhanced to become {{domxref("SVGElement")}} and various subclasses, each representing an element or a family of closely related elements. These interfaces are discussed further in the [SVG API](/en-US/docs/Web/API/SVG_API) documentation.
 
-## 規範
+## Specifications
 
 {{Specifications}}
 
-## 參見
+## See also
 
-- [DOM 範例](/zh-TW/docs/Web/API/Document_Object_Model/Examples)
-- [CSS 物件模型 (CSSOM)](/zh-TW/docs/Web/API/CSS_Object_Model)
+- [DOM Examples](/en-US/docs/Web/API/Document_Object_Model/Examples)
+- [CSS Object Model (CSSOM)](/en-US/docs/Web/API/CSS_Object_Model)
