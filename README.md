@@ -13,7 +13,7 @@ The DOM represents a document with a logical tree. Each branch of the tree ends 
 
 Nodes can also have event handlers attached to them. Once an event is triggered, the event handlers get executed.
 
-To learn more about what the DOM is and how it represents documents, see our article [Introduction to the DOM](/en-US/docs/Web/API/Document_Object_Model/Introduction).
+To learn more about what the DOM is and how it represents documents, see our article [Introduction to the DOM](/en-US/docs/Web/API/Document_Object_Model/Introduction) .
 
 ## DOM interfaces
 
