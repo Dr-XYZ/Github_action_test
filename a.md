@@ -41,7 +41,7 @@ l10n:
 
 {{Compat}}
 
-## 參見
+## 參
 
 - [使用通道訊息](/zh-TW/docs/Web/API/Channel_Messaging_API/Using_channel_messaging)
 - [Web Workers API](/zh-TW/docs/Web/API/Web_Workers_API)
