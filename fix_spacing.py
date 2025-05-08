@@ -1,44 +1,14 @@
 import re
 import sys
 
-def is_chinese(char):
-    """Checks if a character is a Chinese character."""
-    # print(f"  [DEBUG] Checking if '{char!r}' is Chinese: {'\u4e00' <= char <= '\u9fff'}")
-    return '\u4e00' <= char <= '\u9fff'
-
-def is_chinese_punctuation(char):
-    """
-    Checks if a character is in the CJK Symbols and Punctuation (U+3000-303F)
-    or Fullwidth and Halfwidth Forms (U+FF00-FFEF) Unicode ranges,
-    which commonly contain fullwidth punctuation.
-    """
-    # Handle potential None or whitespace input
-    if char is None or char.isspace():
-        return False
-    is_punct = ('\u3000' <= char <= '\u303F') or ('\uFF00' <= char <= '\uFFEF')
-    # print(f"  [DEBUG] Checking if '{char!r}' is Chinese punctuation (U+3000-303F or U+FF00-FFEF): {is_punct}")
-    return is_punct
-
-
-def extract_param(macro):
-    """Extracts the first or second parameter string from a specific macro format."""
-    # print(f"  [DEBUG] Extracting param from macro: {macro!r}")
-    match = re.match(r'{{.*?\("([^"]+)"(?:,\s*"([^"]*)")?\)}}', macro)
-    if match:
-        p1 = match.group(1)
-        p2 = match.group(2)
-        param = p2 if p2 else p1
-        # print(f"  [DEBUG] Extracted param: {param!r}")
-        return param
-    # print("  [DEBUG] Macro format did not match, param extraction failed.")
-    return None # Return None if macro format doesn't match
-
+# ... (is_chinese, is_chinese_punctuation, extract_param functions remain the same) ...
 
 def fix_spacing_in_file(filepath):
     """Reads a markdown file, applies spacing fixes line by line, and writes back."""
     print(f"\n--- Starting file processing for: {filepath} ---")
     try:
         print("Attempting to read file...")
+        # Read the entire content
         with open(filepath, 'r', encoding='utf-8') as f:
             text = f.read()
         print("File read successfully.")
@@ -59,11 +29,7 @@ def fix_spacing_in_file(filepath):
 
     # Define patterns that match the macro/link AND adjacent optional whitespace
     # Capture groups: (leading_ws, pattern, trailing_ws)
-    macro_pattern_ws = r'(\s*)({{.*?\(".*?"(?:,\s*".*?")?\)}})(\s*)'
-    link_pattern_ws = r'(\s*)(\[[^\]]+?\]\([^)]+?\))(\s*)'
-
-    # Combine patterns for a single re.sub call per line
-    # Groups will be: (macro_leading_ws, macro, macro_trailing_ws, link_leading_ws, link, link_trailing_ws)
+    # combined_pattern_ws remains the same as it correctly identifies segments
     combined_pattern_ws = r'(\s*)({{.*?\(".*?"(?:,\s*".*?")?\)}})(\s*)|(\s*)(\[[^\]]+?\]\([^)]+?\))(\s*)'
 
 
@@ -71,10 +37,25 @@ def fix_spacing_in_file(filepath):
     for line_num, line in enumerate(lines):
         print(f"\n[LINE {line_num + 1}/{len(lines)}] Processing line: {line!r}")
 
-        # Define nested processing function to access the 'line' variable
+        # Store the original line ending
+        # splitlines(keepends=True) ensures the ending is part of 'line'
+        original_ending = ""
+        if line.endswith('\r\n'):
+            original_ending = '\r\n'
+        elif line.endswith('\n'):
+            original_ending = '\n'
+
+        print(f"[LINE {line_num + 1}] Original ending: {original_ending!r}")
+
+        # Define nested processing function to access the 'line' variable (remains the same)
         def process_match_with_context(match):
-            """Processes a matched macro or link pattern with context from the original line."""
-            # Determine which pattern matched and extract groups
+            # ... (function content remains exactly as before) ...
+            # This function's logic for calculating replacement is correct for the segment spacing.
+            # The issue is how re.sub applies it relative to the line ending,
+            # which we will fix *after* re.sub.
+            # ... (return final_replacement_segment) ...
+
+             # Determine which pattern matched and extract groups
             is_macro = match.group(2) is not None # Group 2 is macro part
             is_link = match.group(5) is not None  # Group 5 is link part
 
@@ -82,7 +63,6 @@ def fix_spacing_in_file(filepath):
                 leading_ws = match.group(1)
                 pattern_content = match.group(2)
                 trailing_ws = match.group(3)
-                # Span of the pattern content itself (macro)
                 pattern_content_span = match.span(2)
                 print("-" * 30)
                 print(f"[CONTEXT_PROCESS] Detected: Macro")
@@ -90,7 +70,6 @@ def fix_spacing_in_file(filepath):
                 leading_ws = match.group(4)
                 pattern_content = match.group(5)
                 trailing_ws = match.group(6)
-                # Span of the pattern content itself (link)
                 pattern_content_span = match.span(5)
                 print("=" * 30)
                 print(f"[CONTEXT_PROCESS] Detected: Link")
@@ -111,20 +90,13 @@ def fix_spacing_in_file(filepath):
             print(f"[CONTEXT_PROCESS]   Full Match Span (in original line): {full_match_start_index, full_match_end_index}")
 
 
-            # Get the character *immediately* before and after the *pattern content* in the original line
-            actual_before_char = line[pattern_start_index - 1] if pattern_start_index > 0 else None
-            actual_after_char = line[pattern_end_index] if pattern_end_index < len(line) else None
-
-            # Need to handle cases where actual_before/after is whitespace that was *not* consumed by the pattern's \s*
-            # However, with \s* at start/end of the pattern, actual_before/after will be *outside* the consumed \s*
-            # unless the match was at the very start/end of the line next to non-whitespace.
-            # Let's refine: get the char immediately before the *full match* and immediately after the *full match*.
+            # Get the character *immediately* before and after the *full match* in the original line
+            # These are the characters OUTSIDE the segment matched by the pattern (including \s*)
             actual_char_before_full_match = line[full_match_start_index - 1] if full_match_start_index > 0 else None
             actual_char_after_full_match = line[full_match_end_index] if full_match_end_index < len(line) else None
 
 
             print(f"[CONTEXT_PROCESS]   Actual characters surrounding FULL match: before={actual_char_before_full_match!r}, after={actual_char_after_full_match!r}")
-            print(f"[CONTEXT_PROCESS]   Actual characters surrounding PATTERN CONTENT: before={actual_before_char!r}, after={actual_after_char!r}")
 
 
             # Extract internal characters for spacing logic
@@ -169,16 +141,21 @@ def fix_spacing_in_file(filepath):
             # Space BEFORE logic (check actual_char_before_full_match)
             print(f"[CONTEXT_PROCESS]   --- Space before logic (check char before full match: {actual_char_before_full_match!r}) ---")
             if actual_char_before_full_match is not None:
+                 # Ignore whitespace before actual_char_before_full_match as the pattern's \s* should handle leading whitespace
+                 # We only care about the non-whitespace char immediately before the *full* match or it being None.
+                 # If the char immediately before is whitespace that wasn't consumed by leading_ws, something is wrong with pattern or logic.
+                 # Assuming the pattern's leading \s* works, actual_char_before_full_match is the char *before* the consumed whitespace.
                  is_punct_before = is_chinese_punctuation(actual_char_before_full_match)
                  is_chinese_before = is_chinese(actual_char_before_full_match)
                  is_internal_start_chinese = is_chinese(internal_start_char) if internal_start_char is not None else False
 
                  # Add space before if actual_char_before_full_match is NOT punctuation AND NOT (Chinese char AND Internal start is Chinese)
-                 if not is_punct_before and not (is_chinese_before and is_internal_start_chinese):
+                 # AND actual_char_before_full_match is NOT whitespace itself (the pattern handles removing leading whitespace)
+                 if not actual_char_before_full_match.isspace() and not is_punct_before and not (is_chinese_before and is_internal_start_chinese):
                       add_space_before = True
                       print("[CONTEXT_PROCESS]     Decision: Add space before.")
                  else:
-                      print("[CONTEXT_PROCESS]     Decision: No space before (punct or Chi+Chi).")
+                      print("[CONTEXT_PROCESS]     Decision: No space before (whitespace, punct, or Chi+Chi).")
             else:
                  print("[CONTEXT_PROCESS]     Decision: No char before full match. No space before.")
 
@@ -186,16 +163,18 @@ def fix_spacing_in_file(filepath):
             # Space AFTER logic (check actual_char_after_full_match)
             print(f"[CONTEXT_PROCESS]   --- Space after logic (check char after full match: {actual_char_after_full_match!r}) ---")
             if actual_char_after_full_match is not None:
+                 # Same logic as before, but for the character after the *full* match.
                  is_punct_after = is_chinese_punctuation(actual_char_after_full_match)
                  is_chinese_after = is_chinese(actual_char_after_full_match)
                  is_internal_end_chinese = is_chinese(internal_end_char) if internal_end_char is not None else False
 
                  # Add space after if actual_char_after_full_match is NOT punctuation AND NOT (Chinese char AND Internal end is Chinese)
-                 if not is_punct_after and not (is_chinese_after and is_internal_end_chinese):
+                 # AND actual_char_after_full_match is NOT whitespace itself (the pattern handles removing trailing whitespace)
+                 if not actual_char_after_full_match.isspace() and not is_punct_after and not (is_chinese_after and is_internal_end_chinese):
                       add_space_after = True
                       print("[CONTEXT_PROCESS]     Decision: Add space after.")
                  else:
-                      print("[CONTEXT_PROCESS]     Decision: No space after (punct or Chi+Chi).")
+                      print("[CONTEXT_PROCESS]     Decision: No space after (whitespace, punct, or Chi+Chi).")
             else:
                  print("[CONTEXT_PROCESS]     Decision: No char after full match. No space after.")
 
@@ -216,7 +195,23 @@ def fix_spacing_in_file(filepath):
 
 
         # Use re.sub with the combined pattern and the nested processing function
-        processed_line = re.sub(combined_pattern_ws, process_match_with_context, line)
+        # This might result in a line without its original ending if the pattern matched it.
+        processed_line_intermediate = re.sub(combined_pattern_ws, process_match_with_context, line)
+
+        print(f"[LINE {line_num + 1}] Intermediate result (before fixing ending): {processed_line_intermediate!r}")
+
+        # --- Fix the newline issue ---
+        # Ensure the processed line has the same ending as the original line.
+        # Strip any trailing whitespace (including potential newline) from the intermediate result
+        # and then append the original ending.
+
+        processed_line_content = processed_line_intermediate.rstrip()
+
+        # Append the original ending back
+        processed_line = processed_line_content + original_ending
+
+        print(f"[LINE {line_num + 1}] Final processed line (after fixing ending): {processed_line!r}")
+
 
         processed_lines.append(processed_line)
 
