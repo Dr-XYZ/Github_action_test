@@ -12,8 +12,11 @@ def is_chinese_punctuation(char):
     or Fullwidth and Halfwidth Forms (U+FF00-FFEF) Unicode ranges,
     which commonly contain fullwidth punctuation.
     """
+    # Handle potential None input if slicing goes out of bounds
+    if char is None:
+        return False
     is_punct = ('\u3000' <= char <= '\u303F') or ('\uFF00' <= char <= '\uFFEF')
-    # print(f"  [DEBUG] Checking if '{char}' is Chinese punctuation (U+3000-303F or U+FF00-FFEF): {is_punct}")
+    # print(f"  [DEBUG] Checking if '{char!r}' is Chinese punctuation (U+3000-303F or U+FF00-FFEF): {is_punct}")
     return is_punct
 
 
@@ -30,169 +33,9 @@ def extract_param(macro):
     print("  [DEBUG] Macro format did not match, param extraction failed.")
     return None # Return None if macro format doesn't match
 
-def process_macro(match):
-    """Processes a matched macro pattern to add or remove spacing."""
-    # match.group(0) is the entire matched string including surrounding chars and spaces
-    # match.group(1) is the character before
-    # match.group(2) is the macro itself
-    # match.group(3) is the character after
-    full_match_str = match.group(0)
-    before = match.group(1)
-    macro = match.group(2)
-    after = match.group(3)
 
-    print("-" * 30)
-    print(f"[MACRO] Processing match: {full_match_str!r}")
-    print(f"[MACRO]   Groups: before={before!r}, macro={macro!r}, after={after!r}")
-
-    param = extract_param(macro)
-
-    if not param:
-        print("[MACRO]   Param not extracted, returning original match.")
-        # Note: The original regex captures spaces into \s*. re.sub replaces match.group(0).
-        # If param fails, we return the captured parts, which implicitly removes original spaces.
-        # This might not perfectly restore original spacing around failed macros.
-        return before + macro + after
-
-    print(f"[MACRO]   Param first char: {param[0]!r}, last char: {param[-1]!r}")
-
-    result = ''
-
-    # --- Logic for spacing *before* the macro ---
-    print(f"[MACRO]   --- Spacing before logic (char: {before!r}) ---")
-    is_punct_before = is_chinese_punctuation(before)
-    is_chinese_before = is_chinese(before)
-    is_param_start_chinese = is_chinese(param[0]) if param else False # Added safety check if param somehow empty
-
-    print(f"[MACRO]     Before Checks: is_chinese={is_chinese_before!r}, is_punct={is_punct_before!r}")
-    if param:
-        print(f"[MACRO]     Param Start is Chinese: {is_param_start_chinese!r}")
-
-    if is_punct_before:
-        print("[MACRO]     Decision: Before is punctuation, NO space before.")
-        result += before + macro
-    # Otherwise, apply the original rule: add space if before is not Chinese OR macro's param starts with non-Chinese
-    elif not (is_chinese_before and is_param_start_chinese):
-         print("[MACRO]     Decision: Before is not Chinese OR Param Start is not Chinese, ADD space before.")
-         result += before + ' ' + macro
-    else: # before is Chinese AND param[0] is Chinese -> no space
-         print("[MACRO]     Decision: Before is Chinese AND Param Start is Chinese, NO space before.")
-         result += before + macro
-    print(f"[MACRO]   Intermediate result after adding prefix: {result!r}")
-
-
-    # --- Logic for spacing *after* the macro ---
-    print(f"[MACRO]   --- Spacing after logic (char: {after!r}) ---")
-    is_punct_after = is_chinese_punctuation(after)
-    is_chinese_after = is_chinese(after)
-    is_param_end_chinese = is_chinese(param[-1]) if param and len(param) > 0 else False # Added safety check
-
-    print(f"[MACRO]     After Checks: is_chinese={is_chinese_after!r}, is_punct={is_punct_after!r}")
-    if param and len(param) > 0:
-        print(f"[MACRO]     Param End is Chinese: {is_param_end_chinese!r}")
-
-    if is_punct_after:
-        print("[MACRO]     Decision: After is punctuation, NO space after.")
-        result += after
-    # Otherwise, apply the original rule: add space if after is not Chinese OR macro's param ends with non-Chinese
-    elif not (is_chinese_after and is_param_end_chinese):
-         print("[MACRO]     Decision: After is not Chinese OR Param End is not Chinese, ADD space after.")
-         result += ' ' + after
-    else: # after is Chinese AND param[-1] is Chinese -> no space
-         print("[MACRO]     Decision: After is Chinese AND Param End is Chinese, NO space after.")
-         result += after
-
-    print(f"[MACRO]   Final constructed segment for replacement: {result!r}")
-    print("-" * 30)
-    return result
-
-def process_link(match):
-    """Processes a matched link pattern to add or remove spacing."""
-    # match.group(0) is the entire matched string including surrounding chars and spaces
-    # match.group(1) is the character before
-    # match.group(2) is the link text part, e.g., [顯示文字]
-    # match.group(3) is the link URL part, e.g., (url/path)
-    # match.group(4) is the character after
-    full_match_str = match.group(0)
-    before = match.group(1)
-    link_text = match.group(2)
-    link_url = match.group(3)
-    after = match.group(4)
-
-    print("=" * 30)
-    print(f"[LINK] Processing match: {full_match_str!r}")
-    print(f"[LINK]   Groups: before={before!r}, link_text={link_text!r}, link_url={link_url!r}, after={after!r}")
-
-    # Extract the text inside the brackets [] for language check
-    # Assumes link_text is like [text]
-    text_inside = link_text[1:-1]
-    print(f"[LINK]   Extracted text inside link: {text_inside!r}")
-
-    # If the text inside the link is empty, handle as an edge case
-    is_text_inside_valid = bool(text_inside)
-    if not is_text_inside_valid:
-        print("[LINK]   Text inside link is empty or invalid, using simplified logic for spacing.")
-
-    result = ''
-
-    # --- Logic for spacing *before* the link ---
-    print(f"[LINK]   --- Spacing before logic (char: {before!r}) ---")
-    is_punct_before = is_chinese_punctuation(before)
-    is_chinese_before = is_chinese(before)
-    is_link_start_chinese = is_chinese(text_inside[0]) if is_text_inside_valid else False
-
-    print(f"[LINK]     Before Checks: is_chinese={is_chinese_before!r}, is_punct={is_punct_before!r}")
-    if is_text_inside_valid:
-        print(f"[LINK]     Link Text Start is Chinese: {is_link_start_chinese!r}")
-
-
-    if is_punct_before:
-        print("[LINK]     Decision: Before is punctuation, NO space before.")
-        result += before + link_text + link_url
-    # Otherwise, apply the original rule: add space if before is not Chinese OR link text starts with non-Chinese
-    # Also ensure text_inside is not empty before checking its first character
-    elif is_text_inside_valid and not (is_chinese_before and is_link_start_chinese):
-         print("[LINK]     Decision: Before is not Chinese OR Link Text Start is not Chinese, ADD space before.")
-         result += before + ' ' + link_text + link_url
-    else: # before is Chinese AND link text starts with Chinese -> no space (or text_inside is invalid)
-         if not is_text_inside_valid:
-              print("[LINK]     Decision: Text inside link is invalid, NO space before.")
-         else:
-              print("[LINK]     Decision: Before is Chinese AND Link Text Start is Chinese, NO space before.")
-         result += before + link_text + link_url
-    print(f"[LINK]   Intermediate result after adding prefix: {result!r}")
-
-
-    # --- Logic for spacing *after* the link ---
-    print(f"[LINK]   --- Spacing after logic (char: {after!r}) ---")
-    is_punct_after = is_chinese_punctuation(after)
-    is_chinese_after = is_chinese(after)
-    is_link_end_chinese = is_chinese(text_inside[-1]) if is_text_inside_valid and len(text_inside) > 0 else False
-
-    print(f"[LINK]     After Checks: is_chinese={is_chinese_after!r}, is_punct={is_punct_after!r}")
-    if is_text_inside_valid and len(text_inside) > 0:
-        print(f"[LINK]     Link Text End is Chinese: {is_link_end_chinese!r}")
-
-
-    if is_punct_after:
-        print("[LINK]     Decision: After is punctuation, NO space after.")
-        result += after
-    # Otherwise, apply the original rule: add space if after is not Chinese OR link text ends with non-Chinese
-    # Also ensure text_inside is not empty before checking its last character
-    elif is_text_inside_valid and not (is_chinese_after and is_link_end_chinese):
-         print("[LINK]     Decision: After is not Chinese OR Link Text End is not Chinese, ADD space after.")
-         result += ' ' + after
-    else: # after is Chinese AND link text ends with Chinese -> no space (or text_inside is invalid/short)
-         if not (is_text_inside_valid and len(text_inside) > 0):
-             print("[LINK]     Decision: Text inside link is invalid or too short, NO space after.")
-         else:
-             print("[LINK]     Decision: After is Chinese AND Link Text End is Chinese, NO space after.")
-         result += after
-
-    print(f"[LINK]   Final constructed segment for replacement: {result!r}")
-    print("=" * 30)
-    return result
-
+# The main processing function will be defined inside the loop in fix_spacing_in_file
+# to access the current line string.
 
 def fix_spacing_in_file(filepath):
     """Reads a markdown file, applies spacing fixes line by line, and writes back."""
@@ -212,29 +55,156 @@ def fix_spacing_in_file(filepath):
         return
 
     print("Splitting text into lines, preserving line endings...")
+    # Use keepends=True to correctly handle original line breaks
     lines = text.splitlines(keepends=True)
     print(f"Split into {len(lines)} lines.")
     processed_lines = []
 
-    # Regex patterns applied to individual lines.
-    macro_pattern = r'(.)\s*({{.*?\(".*?"(?:,\s*".*?")?\)}})\s*(.)'
-    link_pattern = r'(.)\s*(\[[^\]]+?\])(\([^)]+?\))\s*(.)'
+    # Define simpler regex patterns that match only the macro or link block
+    # This pattern does NOT consume surrounding characters or spaces
+    macro_pattern = r'({{.*?\(".*?"(?:,\s*".*?")?\)}})'
+    link_pattern = r'(\[[^\]]+?\]\([^)]+?\))'
 
     print("\n--- Starting line-by-line processing ---")
     for line_num, line in enumerate(lines):
         print(f"\n[LINE {line_num + 1}/{len(lines)}] Processing line: {line!r}")
 
-        # Apply macro processing to the current line
-        print(f"[LINE {line_num + 1}] Applying macro pattern: {macro_pattern!r}")
-        processed_line = re.sub(macro_pattern, process_macro, line)
-        print(f"[LINE {line_num + 1}] Line after macro processing: {processed_line!r}")
+        # Define nested processing function to access the 'line' variable
+        def process_match_with_context(match):
+            """Processes a matched macro or link pattern with context from the original line."""
+            # match.group(0) is the full matched string (the macro or link block)
+            pattern_content = match.group(0)
+            # Get the start and end indices of the match in the original line
+            start_index, end_index = match.span(0)
 
-        # Apply link processing to the result of macro processing on the current line
-        print(f"[LINE {line_num + 1}] Applying link pattern: {link_pattern!r}")
-        processed_line = re.sub(link_pattern, process_link, processed_line)
-        print(f"[LINE {line_num + 1}] Line after link processing: {processed_line!r}")
+            print("-" * 30)
+            print(f"[CONTEXT_PROCESS] Processing pattern: {pattern_content!r}")
+            print(f"[CONTEXT_PROCESS]   Indices in line: start={start_index}, end={end_index}")
+
+            # Get the character *immediately* before and after the match in the original line
+            actual_before_char = line[start_index - 1] if start_index > 0 else None
+            actual_after_char = line[end_index] if end_index < len(line) else None
+
+            print(f"[CONTEXT_PROCESS]   Actual surrounding characters: before={actual_before_char!r}, after={actual_after_char!r}")
+
+            # Determine if it's a macro or a link to extract internal text
+            is_macro = pattern_content.startswith('{{')
+            is_link = pattern_content.startswith('[') # Assuming valid format, one of these must be true
+
+            param = None
+            text_inside = None
+            is_text_inside_valid = False
+
+            if is_macro:
+                print("[CONTEXT_PROCESS]   Detected: Macro")
+                param = extract_param(pattern_content)
+                # For spacing logic, param[0] and param[-1] are used
+                if param is None: # Cannot process spacing rules without param
+                     print("[CONTEXT_PROCESS]   Param extraction failed, returning original pattern.")
+                     return pattern_content # Return the original macro string
+                param_start_char = param[0] if param else None
+                param_end_char = param[-1] if param and len(param) > 0 else None
+                print(f"[CONTEXT_PROCESS]   Param start='{param_start_char!r}', end='{param_end_char!r}'")
+
+            elif is_link:
+                print("[CONTEXT_PROCESS]   Detected: Link")
+                # Extract text inside [] for links
+                # Assuming link_text part is always match.group(1) from the link pattern
+                # With the simplified pattern, the *whole* link is match.group(0)
+                # We need to re-parse slightly or rely on the structure [text](url)
+                link_text_match = re.match(r'(\[[^\]]+?\])(\([^)]+?\))', pattern_content)
+                if link_text_match:
+                    link_text = link_text_match.group(1)
+                    text_inside = link_text[1:-1]
+                    is_text_inside_valid = bool(text_inside)
+                    print(f"[CONTEXT_PROCESS]   Text inside link='{text_inside!r}'")
+                    if not is_text_inside_valid:
+                         print("[CONTEXT_PROCESS]   Text inside link is empty, spacing logic might be simplified.")
+                    link_start_char = text_inside[0] if is_text_inside_valid else None
+                    link_end_char = text_inside[-1] if is_text_inside_valid and len(text_inside) > 0 else None
+                    print(f"[CONTEXT_PROCESS]   Link text start='{link_start_char!r}', end='{link_end_char!r}'")
+                else:
+                    print("[CONTEXT_PROCESS]   Link format invalid, returning original pattern.")
+                    return pattern_content # Return the original link string
+
+            # --- Building the result string: optional_space + pattern + optional_space ---
+            prefix_space = ""
+            suffix_space = ""
+
+            # Determine internal characters for spacing logic
+            internal_start_char = None
+            internal_end_char = None
+            if is_macro:
+                 internal_start_char = param_start_char
+                 internal_end_char = param_end_char
+            elif is_link and is_text_inside_valid:
+                 internal_start_char = link_start_char
+                 internal_end_char = link_end_char
+
+            # --- Logic for space *before* the pattern ---
+            print(f"[CONTEXT_PROCESS]   --- Space before logic (actual char: {actual_before_char!r}) ---")
+            # Add space BEFORE if actual_before_char exists AND is NOT Chinese punctuation AND (is NOT Chinese OR internal_start_char is NOT Chinese)
+            if actual_before_char is not None and not is_chinese_punctuation(actual_before_char):
+                is_chinese_before = is_chinese(actual_before_char)
+                is_internal_start_chinese = is_chinese(internal_start_char) if internal_start_char is not None else False # Treat None internal start as not Chinese
+
+                # Add space if the character before is NOT Chinese OR the internal start is NOT Chinese
+                # This covers Eng-Eng, Eng-Chi, Chi-Eng transitions (if before is not punct)
+                if not is_chinese_before or not is_internal_start_chinese:
+                     print("[CONTEXT_PROCESS]     Decision: Before char exists and not punct, AND (not Chinese or internal start not Chinese), ADD space before.")
+                     prefix_space = " "
+                else:
+                     print("[CONTEXT_PROCESS]     Decision: Before char exists and not punct, AND (is Chinese and internal start is Chinese), NO space before.")
+            else:
+                 print("[CONTEXT_PROCESS]     Decision: No before char or before char is punctuation, NO space before.")
+
+
+            # --- Logic for space *after* the pattern ---
+            print(f"[CONTEXT_PROCESS]   --- Space after logic (actual char: {actual_after_char!r}) ---")
+            # Add space AFTER if actual_after_char exists AND is NOT Chinese punctuation AND (is NOT Chinese OR internal_end_char is NOT Chinese)
+            if actual_after_char is not None and not is_chinese_punctuation(actual_after_char):
+                is_chinese_after = is_chinese(actual_after_char)
+                is_internal_end_chinese = is_chinese(internal_end_char) if internal_end_char is not None else False # Treat None internal end as not Chinese
+
+                # Add space if the character after is NOT Chinese OR the internal end is NOT Chinese
+                if not is_chinese_after or not is_internal_end_chinese:
+                     print("[CONTEXT_PROCESS]     Decision: After char exists and not punct, AND (not Chinese or internal end not Chinese), ADD space after.")
+                     suffix_space = " "
+                else:
+                     print("[CONTEXT_PROCESS]     Decision: After char exists and not punct, AND (is Chinese and internal end is Chinese), NO space after.")
+            else:
+                 print("[CONTEXT_PROCESS]     Decision: No after char or after char is punctuation, NO space after.")
+
+
+            final_result_segment = prefix_space + pattern_content + suffix_space
+            print(f"[CONTEXT_PROCESS]   Final constructed segment for replacement: {final_result_segment!r}")
+            print("-" * 30)
+            return final_result_segment # This replaces the *original* pattern_content
+
+
+        # Apply the processing function to the current line using the simpler patterns
+        # Note: We apply macro processing first, then link processing on the result.
+        # The nested function 'process_match_with_context' now encapsulates the logic for BOTH.
+        # We need two separate re.sub calls, each using a lambda that wraps the nested function
+        # and passes the correct 'is_macro'/'is_link' context, or we just handle both pattern types
+        # within a single re.sub call with a combined pattern.
+
+        # Let's use a combined pattern for efficiency and simpler logic flow
+        # Match either a macro OR a link
+        combined_pattern = r'({{.*?\(".*?"(?:,\s*".*?")?\)}})|(\[[^\]]+?\]\([^)]+?\))'
+
+        # Use re.sub with the combined pattern and the nested processing function
+        # The nested function 'process_match_with_context' will be called for each match
+        # Match groups for combined_pattern: group(1) for macro, group(2) for link
+        processed_line_temp = re.sub(combined_pattern, process_match_with_context, line)
+
+        # The previous separate macro/link processing steps are now combined.
+        # We need to update the variable name.
+        processed_line = processed_line_temp
+
 
         processed_lines.append(processed_line)
+
     print("\n--- Finished line-by-line processing ---")
 
     print("Joining processed lines back together...")
