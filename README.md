@@ -1,22 +1,22 @@
 ---
-title: Examples of web and XML development using the DOM
+title: 使用 DOM 進行網頁與 XML 開發的範例
 slug: Web/API/Document_Object_Model/Examples
 page-type: guide
 ---
 
 {{DefaultAPISidebar("DOM")}}
 
-This chapter provides some longer examples of web and XML development using the DOM. Wherever possible, the examples use common APIs, tricks, and patterns in JavaScript for manipulating the document object.
+本章提供一些較長的使用 DOM 進行網頁與 XML 開發的範例。在可行情況下，這些範例使用 JavaScript 中常見的 API、技巧及模式來操作 document 物件。
 
-## Example 1: height and width
+## 範例 1：height 與 width
 
-The following example shows the use of the `height` and `width` properties alongside images of varying dimensions:
+以下範例展示 `height` 與 `width` 屬性與不同尺寸的圖片一起使用的情況：
 
 ```html
 <!doctype html>
 <html lang="en">
   <head>
-    <title>width/height example</title>
+    <title>width/height 範例</title>
     <script>
       function init() {
         const arrImages = new Array(3);
@@ -51,26 +51,26 @@ The following example shows the use of the `height` and `width` properties along
   </head>
   <body onload="init();">
     <p>
-      Image 1: no height, width, or style
+      圖片 1：無 height、width 或 style
       <img
         id="image1"
-        src="https://www.mozilla.org/images/mozilla-banner.gif" />
+        src="[https://www.mozilla.org/images/mozilla-banner.gif](https://www.mozilla.org/images/mozilla-banner.gif)" />
     </p>
 
     <p>
-      Image 2: height="50", width="500", but no style
+      圖片 2：height="50"、width="500"，但無 style
       <img
         id="image2"
-        src="https://www.mozilla.org/images/mozilla-banner.gif"
+        src="[https://www.mozilla.org/images/mozilla-banner.gif](https://www.mozilla.org/images/mozilla-banner.gif)"
         height="50"
         width="500" />
     </p>
 
     <p>
-      Image 3: no height, width, but style="height: 50px; width: 500px;"
+      圖片 3：無 height、width，但 style="height: 50px; width: 500px;"
       <img
         id="image3"
-        src="https://www.mozilla.org/images/mozilla-banner.gif"
+        src="[https://www.mozilla.org/images/mozilla-banner.gif](https://www.mozilla.org/images/mozilla-banner.gif)"
         style="height: 50px; width: 500px;" />
     </p>
 
@@ -79,13 +79,13 @@ The following example shows the use of the `height` and `width` properties along
 </html>
 ```
 
-## Example 2: Image Attributes
+## 範例 2：圖片屬性
 
 ```html
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Modifying an image border</title>
+    <title>修改圖片邊框</title>
 
     <script>
       function setBorderWidth(width) {
@@ -102,32 +102,32 @@ The following example shows the use of the `height` and `width` properties along
         style="border: 5px solid green;"
         width="100"
         height="100"
-        alt="border test" />
+        alt="邊框測試" />
     </p>
 
     <form name="FormName">
       <input
         type="button"
-        value="Make border 20px-wide"
+        value="將邊框設為 20px 寬"
         onclick="setBorderWidth(20);" />
       <input
         type="button"
-        value="Make border 5px-wide"
+        value="將邊框設為 5px 寬"
         onclick="setBorderWidth(5);" />
     </form>
   </body>
 </html>
 ```
 
-## Example 3: Manipulating Styles
+## 範例 3：操作樣式
 
-In this simple example, some basic style properties of an HTML paragraph element are accessed using the style object on the element and that object's CSS style properties, which can be retrieved and set from the DOM. In this case, you are manipulating the individual styles directly. In the next example (see Example 4), you can use stylesheets and their rules to change styles for whole documents.
+在這個簡單的範例中，透過元素上的 style 物件及其 CSS 樣式屬性來存取 HTML 段落元素的某些基本樣式屬性，這些屬性可以從 DOM 中取得並設定。在這個情況下，你是直接操作個別樣式。在下一個範例（參見範例 4）中，你可以使用樣式表及其規則來更改整個文件的樣式。
 
 ```html
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Changing color and font-size example</title>
+    <title>更改顏色與字體大小範例</title>
 
     <script>
       function changeText() {
@@ -139,20 +139,20 @@ In this simple example, some basic style properties of an HTML paragraph element
     </script>
   </head>
   <body>
-    <p id="pid" onclick="window.location.href = 'http://www.cnn.com/';">
-      linker
+    <p id="pid" onclick="window.location.href = '[http://www.cnn.com/](http://www.cnn.com/)';">
+      連結器
     </p>
 
     <form>
-      <p><input value="rec" type="button" onclick="changeText();" /></p>
+      <p><input value="變更" type="button" onclick="changeText();" /></p>
     </form>
   </body>
 </html>
 ```
 
-## Example 4: Using Stylesheets
+## 範例 4：使用樣式表
 
-The {{domxref("document.styleSheets", "styleSheets")}} property on the {{domxref("document")}} object returns a list of the stylesheets that have been loaded on that document. You can access these stylesheets and their rules individually using the stylesheet, style, and {{domxref("CSSRule")}} objects, as demonstrated in this example, which prints out all of the style rule selectors to the console.
+{{domxref("document")}} 物件上的 {{domxref("document.styleSheets", "styleSheets")}} 屬性會回傳載入至該文件的樣式表列表。你可以使用 stylesheet、style 與 {{domxref("CSSRule")}} 物件個別存取這些樣式表及其規則，如本範例所示，它會將所有樣式規則的選擇器印出到控制台。
 
 ```js
 const ss = document.styleSheets;
@@ -164,7 +164,7 @@ for (let i = 0; i < ss.length; i++) {
 }
 ```
 
-For a document with a single stylesheet in which the following three rules are defined:
+對於一個只有一個樣式表且定義了以下三個規則的文件來說：
 
 ```css
 body {
@@ -180,7 +180,7 @@ p {
 }
 ```
 
-This script outputs the following:
+這個腳本會輸出以下內容：
 
 ```plain
 BODY
@@ -188,17 +188,17 @@ P
 #LUMPY
 ```
 
-## Example 5: Event Propagation
+## 範例 5：事件傳播
 
-This example demonstrates how events fire and are handled in the DOM in a very simple way. When the BODY of this HTML document loads, an event listener is registered with the top row of the TABLE. The event listener handles the event by executing the function stopEvent, which changes the value in the bottom cell of the table.
+這個範例非常簡單地示範了事件在 DOM 中如何觸發與處理。當這個 HTML 文件的 BODY 載入時，會在 TABLE 的頂部列註冊一個事件監聽器。事件監聽器透過執行 stopEvent 函式來處理事件，該函式會改變表格底部儲存格中的值。
 
-However, stopEvent also calls an event object method, {{domxref("event.stopPropagation")}} , which keeps the event from bubbling any further up into the DOM. Note that the table itself has an {{domxref("Element.click_event","onclick")}} event handler that ought to display a message when the table is clicked. But the stopEvent method has stopped propagation, and so after the data in the table is updated, the event phase is effectively ended, and an alert box is displayed to confirm this.
+然而，stopEvent 也會呼叫一個事件物件方法 {{domxref("event.stopPropagation")}}，它會阻止事件進一步向上傳播到 DOM。請注意，表格本身有一個 {{domxref("Element.click_event","onclick")}} 事件處理器，當點擊表格時應該顯示訊息。但 stopEvent 方法已經阻止了傳播，所以在表格中的資料更新後，事件階段實際上就結束了，並會顯示一個警示框來確認這點。
 
 ```html
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Event Propagation</title>
+    <title>事件傳播</title>
 
     <style>
       #t-daddy {
@@ -214,9 +214,9 @@ However, stopEvent also calls an event object method, {{domxref("event.stopPropa
         const c2 = document.getElementById("c2");
         c2.textContent = "hello";
 
-        // this ought to keep t-daddy from getting the click.
+        // 這應該阻止 t-daddy 收到點擊事件。
         event.stopPropagation();
-        alert("event propagation halted.");
+        alert("事件傳播已停止。");
       }
 
       function load() {
@@ -239,17 +239,17 @@ However, stopEvent also calls an event object method, {{domxref("event.stopPropa
 </html>
 ```
 
-## Example 6: getComputedStyle
+## 範例 6：getComputedStyle
 
-This example demonstrates how the {{domxref("window.getComputedStyle")}} method can be used to get the styles of an element that are not set using the `style` attribute or with JavaScript (e.g., `elt.style.backgroundColor="rgb(173 216 230)"`). These latter types of styles can be retrieved with the more direct {{domxref("HTMLElement.style", "elt.style")}} property, whose properties are listed in the [DOM CSS Properties List](/en-US/docs/Web/CSS/Reference) .
+此範例示範如何使用 {{domxref("window.getComputedStyle")}} 方法來取得未使用 `style` 屬性或 JavaScript（例如 `elt.style.backgroundColor="rgb(173 216 230)"`）設定的元素樣式。後者類型的樣式可以透過更直接的 {{domxref("HTMLElement.style", "elt.style")}} 屬性來取得，其屬性列於 [DOM CSS Properties List](/zh-TW/docs/Web/CSS/Reference)。
 
-`getComputedStyle()` returns a {{domxref("CSSStyleDeclaration")}} object, whose individual style properties can be referenced with this object's {{domxref("CSSStyleDeclaration.getPropertyValue()", "getPropertyValue()")}} method, as the following example document shows.
+`getComputedStyle()` 回傳一個 {{domxref("CSSStyleDeclaration")}} 物件，可以使用此物件的 {{domxref("CSSStyleDeclaration.getPropertyValue()", "getPropertyValue()")}} 方法來參照其個別樣式屬性，如下方範例文件所示。
 
 ```html
 <!doctype html>
 <html lang="en">
   <head>
-    <title>getComputedStyle example</title>
+    <title>getComputedStyle 範例</title>
 
     <script>
       function cStyles() {
@@ -297,27 +297,27 @@ This example demonstrates how the {{domxref("window.getComputedStyle")}} method 
           id="t2"
           type="text"
           value="2" />
-        bg-color<input id="t3" type="text" value="3" />
+        背景顏色<input id="t3" type="text" value="3" />
       </p>
     </form>
   </body>
 </html>
 ```
 
-## Example 7: Displaying Event Object Properties
+## 範例 7：顯示事件物件屬性
 
-This example uses DOM methods to display all the properties of the {{domxref("Window.load_event", "onload")}}  {{domxref("event")}} object and their values in a table. It also shows a useful technique of using a [`for...in`](/en-US/docs/Web/JavaScript/Reference/Statements/for...in) loop to iterate over the properties of an object to get their values.
+此範例使用 DOM 方法將 {{domxref("Window.load_event", "onload")}} {{domxref("event")}} 物件的所有屬性及其值顯示在表格中。它也展示了一種使用 [`for...in`](/zh-TW/docs/Web/JavaScript/Reference/Statements/for...in) 迴圈來迭代物件屬性以取得其值的實用技巧。
 
-The properties of event objects differs greatly between browsers, the [WHATWG DOM Standard](https://dom.spec.whatwg.org/) lists the standard properties, however many browsers have extended these greatly.
+事件物件的屬性在不同瀏覽器之間差異很大，[WHATWG DOM Standard](https://dom.spec.whatwg.org/) 列出了標準屬性，但許多瀏覽器已大幅擴展了這些屬性。
 
-Put the following code into a blank text file and load it into a variety of browsers, you'll be surprised at the different number and names of properties. You might also like to add some elements in the page and call this function from different event handlers.
+將以下程式碼放入空白文字檔案中，並在各種瀏覽器中載入它，你會對屬性數量與名稱的差異感到驚訝。你可能也想在頁面中加入一些元素，並從不同的事件處理器中呼叫此函式。
 
 ```html
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Show Event properties</title>
+    <title>顯示事件屬性</title>
 
     <style>
       table {
@@ -351,7 +351,8 @@ Put the following code into a blank text file and load it into a variety of brow
         const table = document.createElement("table");
         const thead = table.createTHead();
         let row = thead.insertRow(-1);
-        const labelList = ["#", "Property", "Value"];
+        // 標頭：#, 屬性, 值
+        const labelList = ["#", "屬性", "值"];
         const len = labelList.length;
 
         for (let i = 0; i < len; i++) {
@@ -379,22 +380,22 @@ Put the following code into a blank text file and load it into a variety of brow
   </head>
 
   <body>
-    <h1>Properties of the DOM <span id="eventType"></span> Event Object</h1>
+    <h1>DOM <span id="eventType"></span> 事件物件的屬性</h1>
   </body>
 </html>
 ```
 
-## Example 8: Using the DOM Table Interface
+## 範例 8：使用 DOM Table 介面
 
-The DOM {{domxref("HTMLTableElement")}} interface provides some convenience methods for creating and manipulating tables. Two frequently used methods are {{domxref("HTMLTableElement.insertRow")}} and {{domxref("HTMLTableRowElement.insertCell")}} .
+DOM {{domxref("HTMLTableElement")}} 介面提供了一些便利方法來建立和操作表格。兩個常用的方法是 {{domxref("HTMLTableElement.insertRow")}} 和 {{domxref("HTMLTableRowElement.insertCell")}}。
 
-To add a row and some cells to an existing table:
+若要將列和一些儲存格新增到現有表格：
 
 ```html
 <table id="table0">
   <tr>
-    <td>Row 0 Cell 0</td>
-    <td>Row 0 Cell 1</td>
+    <td>第 0 列 第 0 儲存格</td>
+    <td>第 0 列 第 1 儲存格</td>
   </tr>
 </table>
 
@@ -406,14 +407,15 @@ To add a row and some cells to an existing table:
 
   for (let i = 0; i < 2; i++) {
     cell = row.insertCell(-1);
-    text = "Row " + row.rowIndex + " Cell " + i;
+    // 以下字串將顯示在儲存格中。
+    text = "第 " + row.rowIndex + " 列 第 " + i + " 儲存格";
     cell.appendChild(document.createTextNode(text));
   }
 </script>
 ```
 
-### Notes
+### 備註
 
-- A table's {{domxref("element.innerHTML","innerHTML")}} property should never be used to modify a table, although you can use it to write an entire table or the content of a cell.
-- If DOM Core methods {{domxref("document.createElement")}} and {{domxref("Node.appendChild")}} are used to create rows and cells, IE requires that they are appended to a {{HTMLElement("tbody")}} element, whereas other browsers will allow appending to a {{HTMLElement("table")}} element (the rows will be added to the last `<tbody>` element).
-- There are a number of other convenience methods belonging to the [`HTMLTableElement` interface](/en-US/docs/Web/API/HTMLTableElement#instance_methods) that can be used for creating and modifying tables.
+- 不應使用表格的 {{domxref("element.innerHTML","innerHTML")}} 屬性來修改表格，但你可以使用它來寫入整個表格或儲存格的內容。
+- 如果使用 DOM Core 方法 {{domxref("document.createElement")}} 和 {{domxref("Node.appendChild")}} 來建立列和儲存格，IE 要求將它們附加到 {{HTMLElement("tbody")}} 元素，而其他瀏覽器則允許附加到 {{HTMLElement("table")}} 元素（列將新增到最後一個 `<tbody>` 元素）。
+- [`HTMLTableElement` 介面](/zh-TW/docs/Web/API/HTMLTableElement#instance_methods)還有許多其他便利方法可用於建立和修改表格。
