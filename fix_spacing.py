@@ -1,17 +1,39 @@
 import re
 import sys
 
+# ... (其他函數 is_chinese, extract_param, process_macro, process_link 不變) ...
+
+def is_chinese_punctuation(char):
+    """
+    Checks if a character is in the CJK Symbols and Punctuation (U+3000-303F)
+    or Fullwidth and Halfwidth Forms (U+FF00-FFEF) Unicode ranges,
+    which commonly contain fullwidth punctuation.
+    """
+    # CJK Ideographic Punctuation range (U+3000 to U+303F)
+    # Fullwidth ASCII punctuation and other symbols (U+FF00 to U+FFEF)
+    return ('\u3000' <= char <= '\u303F') or ('\uFF00' <= char <= '\uFFEF')
+
+# ... (fix_spacing_in_file 和 __main__ 部分不變) ...
+
+# 完整的程式碼如下：
+
+import re
+import sys
+
 def is_chinese(char):
     """Checks if a character is a Chinese character."""
     return '\u4e00' <= char <= '\u9fff'
 
 def is_chinese_punctuation(char):
-    """Checks if a character is a common Chinese punctuation mark or in CJK punctuation range."""
-    # Common Chinese punctuation characters
-    chinese_punct_chars = set('，。！？；：、‘’“”﹙﹚〈〉《》【】『』～—…')
+    """
+    Checks if a character is in the CJK Symbols and Punctuation (U+3000-303F)
+    or Fullwidth and Halfwidth Forms (U+FF00-FFEF) Unicode ranges,
+    which commonly contain fullwidth punctuation.
+    """
     # CJK Ideographic Punctuation range (U+3000 to U+303F)
-    # Fullwidth ASCII punctuation and other symbols (U+FF00 to U+FFEF) - includes fullwidth comma, period etc.
-    return char in chinese_punct_chars or ('\u3000' <= char <= '\u303F') or ('\uFF00' <= char <= '\uFFEF')
+    # Fullwidth ASCII punctuation and other symbols (U+FF00 to U+FFEF)
+    return ('\u3000' <= char <= '\u303F') or ('\uFF00' <= char <= '\uFFEF')
+
 
 def extract_param(macro):
     """Extracts the first or second parameter string from a specific macro format."""
@@ -30,27 +52,13 @@ def process_macro(match):
     after = match.group(3)  # Character after the macro
     param = extract_param(macro) # The text content within the macro
 
-    # Note: When processing line by line, before and after are guaranteed to be on the same line as the macro.
-
     if not param:
-        # If parameter extraction fails, return the original match unchanged
-        # The captured 'before' and 'after' include spaces potentially removed by regex \s*
-        # We need to be careful here. If the original match was "a {{macro}} b" where spaces were captured by \s*
-        # and param extraction failed, simply returning before+macro+after ("a{{macro}}b") might be wrong.
-        # However, the original regex captured the *characters* before and after, with \s* *between* the character and the pattern.
-        # So, the captured groups are just the character and the macro/link. The spaces are outside.
-        # Let's re-verify the regex behavior on the original text. Yes, `(.)\s*(pattern)\s*(.)` captures the characters and the pattern separately.
-        # So, if param fails, we should return the characters plus the macro without re-adding spaces that were removed by re.sub implicitly.
-        # But since we process line by line, the \s* won't cross newlines anymore.
-        # Let's assume the original behaviour of `re.sub` with the match object is what we need here.
-        # The simplest is to just re-insert the captured parts without spacing logic if param fails.
-        return before + macro + after # This might still be slightly off if original had spaces, but let's stick to the logic if param is none.
-
+        return before + macro + after
 
     result = ''
 
     # --- Logic for spacing *before* the macro ---
-    # If the character before is Chinese punctuation, no space is added
+    # If the character before is Chinese punctuation (fullwidth), no space is added
     if is_chinese_punctuation(before):
         result += before + macro
     # Otherwise, apply the original rule: add space if before is not Chinese OR macro's param starts with non-Chinese
@@ -61,7 +69,7 @@ def process_macro(match):
 
 
     # --- Logic for spacing *after* the macro ---
-    # If the character after is Chinese punctuation, no space is added
+    # If the character after is Chinese punctuation (fullwidth), no space is added
     if is_chinese_punctuation(after):
         result += after
     # Otherwise, apply the original rule: add space if after is not Chinese OR macro's param ends with non-Chinese
@@ -81,16 +89,12 @@ def process_link(match):
     # Extract the text inside the brackets [] for language check
     text_inside = link_text[1:-1]
 
-    # Note: When processing line by line, before and after are guaranteed to be on the same line as the link.
-
-    # If the text inside the link is empty, handle as an edge case (though regex [^\]]+? should prevent this)
-    # We'll still check text_inside validity before accessing [0] or [-1]
     is_text_inside_valid = bool(text_inside)
 
     result = ''
 
     # --- Logic for spacing *before* the link ---
-    # If the character before is Chinese punctuation, no space is added
+    # If the character before is Chinese punctuation (fullwidth), no space is added
     if is_chinese_punctuation(before):
         result += before + link_text + link_url
     # Otherwise, apply the original rule: add space if before is not Chinese OR link text starts with non-Chinese
@@ -101,7 +105,7 @@ def process_link(match):
          result += before + link_text + link_url
 
     # --- Logic for spacing *after* the link ---
-    # If the character after is Chinese punctuation, no space is added
+    # If the character after is Chinese punctuation (fullwidth), no space is added
     if is_chinese_punctuation(after):
         result += after
     # Otherwise, apply the original rule: add space if after is not Chinese OR link text ends with non-Chinese
@@ -127,12 +131,10 @@ def fix_spacing_in_file(filepath):
         return
 
     # Split the text into lines, keeping the original line endings.
-    # This prevents regex matches from spanning across lines and preserves original newlines.
     lines = text.splitlines(keepends=True)
     processed_lines = []
 
     # Regex patterns applied to individual lines.
-    # The \s* will now only match spaces/tabs *within* a line.
     macro_pattern = r'(.)\s*({{.*?\(".*?"(?:,\s*".*?")?\)}})\s*(.)'
     link_pattern = r'(.)\s*(\[[^\]]+?\])(\([^)]+?\))\s*(.)'
 
@@ -144,9 +146,6 @@ def fix_spacing_in_file(filepath):
         processed_lines.append(processed_line)
 
     # Join the processed lines back together.
-    # Since splitlines(keepends=True) was used, each string in processed_lines
-    # already contains its original line ending (or is the last line without one).
-    # So we just concatenate them.
     output_text = "".join(processed_lines)
 
     try:
