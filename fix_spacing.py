@@ -33,9 +33,6 @@ def fix_spacing(text):
     text = re.sub(r'([a-zA-Z0-9])(?=[\u4e00-\u9fff])', r'\1 ', text)
 
     # 移除中英之間因補空格而意外重複的空格（只限於中英交界）
-    text = re.sub(r'([\u4e00-\u9fff])\s{2,}([a-zA-Z0-9])', r'\1 \2', text)
-    text = re.sub(r'([a-zA-Z0-9])\s{2,}([\u4e00-\u9fff])', r'\1 \2', text)
-
     return text
 def process_markdown_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
