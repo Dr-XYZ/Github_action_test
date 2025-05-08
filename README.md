@@ -1,54 +1,81 @@
 ---
-title: Document：scroll 事件
-slug: Web/API/Document/scroll_event
+title: Document：readyState 屬性
+slug: Web/API/Document/readyState
 l10n:
-  sourceCommit: f5e710f5c620c8d3c8b179f3b062d6bbdc8389ec
+  sourceCommit: acfe8c9f1f4145f77653a2bc64a9744b001358dc
 ---
 
-{{APIRef}}
+{{APIRef("DOM")}}
 
-**`scroll`** 事件會在文件視區被捲動時觸發。若要偵測捲動已完成的時機，參見 `Document` 的 {{domxref("Document/scrollend_event", "scrollend")}} 事件。若是元素的捲動，參見 `Element` 的 {{domxref("Element/scroll_event", "scroll")}} 事件。
+**`Document.readyState`** 屬性描述 {{domxref("document")}} 的載入狀態。當此屬性的值改變時，{{domxref("Document/readystatechange_event", "readystatechange")}} 事件會在 {{domxref("document")}} 物件上觸發。
 
-## 語法
+## 值
 
-在方法中使用事件名稱，例如 {{domxref("EventTarget.addEventListener", "addEventListener()")}}，或設定事件處理屬性。
+文件的 `readyState` 可以是以下之一：
 
-```js-nolint
-addEventListener("scroll", (event) => { })
-
-onscroll = (event) => { }
-```
-
-## 事件類型
-
-一個通用的 {{domxref("Event")}}。
+- `loading`
+  - : {{domxref("document")}} 仍在載入中。
+- `interactive`
+  - : 文件已完成載入並且文件已被解析，但子資源（例如腳本、圖片、樣式表和框架）仍在載入中。此狀態表示 {{domxref("Document/DOMContentLoaded_event", "DOMContentLoaded")}} 事件即將觸發。
+- `complete`
+  - : 文件和所有子資源已完成載入。此狀態表示 {{domxref("Window/load_event", "load")}} 事件即將觸發。
 
 ## 範例
 
-### 捲動事件的節流
-
-由於 `scroll` 事件可能以高頻率觸發，事件處理器不應執行計算量大的操作，例如 DOM 修改。建議透過 {{DOMxRef("Window.requestAnimationFrame()", "requestAnimationFrame()")}}、{{DOMxRef("Window.setTimeout", "setTimeout()")}} 或 {{DOMxRef("CustomEvent")}} 進行{{glossary("throttle", 節流")}}處理，如下所示。
-
-然而需要注意的是，輸入事件和動畫幀的觸發頻率大致相同，因此以下的最佳化通常不是必要的。此範例針對 `requestAnimationFrame` 最佳化了 `scroll` 事件。
+### 不同的載入狀態
 
 ```js
-let lastKnownScrollPosition = 0;
-let ticking = false;
-
-function doSomething(scrollPos) {
-  // 使用捲動位置進行某些操作
+switch (document.readyState) {
+  case "loading":
+    // 文件正在載入中。
+    break;
+  case "interactive": {
+    // 文件已完成載入，我們可以存取 DOM 元素。
+    // 子資源（例如腳本、圖片、樣式表和框架）仍在載入中。
+    const span = document.createElement("span");
+    span.textContent = "一個 <span> 元素。";
+    document.body.appendChild(span);
+    break;
+  }
+  case "complete":
+    // 頁面已完全載入。
+    console.log(
+      `第一條 CSS 規則是：${document.styleSheets[0].cssRules[0].cssText}`,
+    );
+    break;
 }
+```
 
-document.addEventListener("scroll", (event) => {
-  lastKnownScrollPosition = window.scrollY;
+### 使用 readystatechange 作為 DOMContentLoaded 事件的替代方案
 
-  if (!ticking) {
-    window.requestAnimationFrame(() => {
-      doSomething(lastKnownScrollPosition);
-      ticking = false;
-    });
+```js
+// DOMContentLoaded 事件的替代方案
+document.onreadystatechange = () => {
+  if (document.readyState === "interactive") {
+    initApplication();
+  }
+};
+```
 
-    ticking = true;
+### 使用 readystatechange 作為 load 事件的替代方案
+
+```js
+// load 事件的替代方案
+document.onreadystatechange = () => {
+  if (document.readyState === "complete") {
+    initApplication();
+  }
+};
+```
+
+### 使用 readystatechange 事件監聽器在 DOMContentLoaded 之前插入或修改 DOM
+
+```js
+document.addEventListener("readystatechange", (event) => {
+  if (event.target.readyState === "interactive") {
+    initLoader();
+  } else if (event.target.readyState === "complete") {
+    initApp();
   }
 });
 ```
@@ -63,6 +90,7 @@ document.addEventListener("scroll", (event) => {
 
 ## 參見
 
-- [Document：`scrollend` 事件](/zh-TW/docs/Web/API/Document/scrollend_event)
-- [Element：`scroll` 事件](/zh-TW/docs/Web/API/Element/scroll_event)
-- [Element：`scrollend` 事件](/zh-TW/docs/Web/API/Element/scrollend_event)
+- 相關事件：
+  - {{domxref("Document/readystatechange_event", "readystatechange")}}
+  - {{domxref("Document/DOMContentLoaded_event", "DOMContentLoaded")}}
+  - {{domxref("Window/load_event", "load")}}
