@@ -5,7 +5,7 @@ slug: Web/API/Document_Object_Model
 
 {{DefaultAPISidebar("DOM")}}
 
-**文件物件模型**（**DOM**）透過在記憶體中表示文件結構（例如代表網頁的 HTML），將網頁連接到腳本或程式設計語言。通常是指 JavaScript，儘管將 HTML、SVG 或 XML 文件模型化為物件並非核心 JavaScript 語言的一部分。
+**文件物件模型**（**DOM**）將文件的結構（例如代表 Web 頁面的 HTML）表示在記憶體中，以此連接 Web 頁面到腳本或程式設計語言。通常是指 JavaScript，儘管將 HTML、SVG 或 XML 文件模型化為物件並非 JavaScript 語言核心的一部分。
 
 DOM 用邏輯樹來表示文件。樹的每個分支都終止於一個節點，每個節點都包含物件。DOM 方法允許以程式設計方式存取樹。藉由這些方法，你可以更改文件的結構、樣式或內容。
 
