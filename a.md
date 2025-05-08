@@ -3,11 +3,7 @@ title: Document：querySelector() 方法
 slug: Web/API/Document/querySelector
 l10n:
   sourceCommit: e9b6cd1b7fa8612257b72b2a85a96dd7d45c0200
----
-
-{{ApiRef("DOM")}}
-
-{{domxref("Document")}} 的 **`querySelector()`** 方法回傳文件中第一個符合指定 [CSS 選擇器](/zh-TW/docs/Web/CSS/CSS_selectors)或一組 CSS 選擇器的{{domxref("Element", "element 元素")}} 使用。如果沒有找到匹配項，則回傳 `null`。
+--- {{ApiRef("DOM")}} {{domxref("Document")}} 的 **`querySelector()`** 方法回傳文件中第一個符合指定 [CSS 選擇器](/zh-TW/docs/Web/CSS/CSS_selectors)或一組 CSS 選擇器的 {{domxref("Element", "element 元素")}}使用。如果沒有找到匹配項，則回傳 `null`。
 
 翻譯如下：
 
@@ -29,18 +25,17 @@ querySelector(selectors)
 
   - : 包含一個或多個選擇器的字串。此字串必須是有效的 CSS 選擇器字串；如果不是，則會拋出 `SyntaxError` 例外。
 
-    注意 HTML 規範並不要求屬性值是有效的 CSS 識別符。如果 [`class`](/zh-TW/docs/Web/HTML/Reference/Global_attributes/class) 或 [`id`](/zh-TW/docs/Web/HTML/Reference/Global_attributes/id) 屬性值不是有效的 CSS 識別符，那麼在選擇器中使用它之前，你必須對其進行轉義，可以通過呼叫 {{domxref("CSS.escape_static", "CSS.escape()")}} 或使用 [轉義字元](/zh-TW/docs/Web/CSS/ident#轉義字元) 中描述的技術之一進行轉義。參見[轉義屬性值](#轉義屬性值)範例。
+    注意 HTML 規範並不要求屬性值是有效的 CSS 識別符。如果 [`class`](/zh-TW/docs/Web/HTML/Reference/Global_attributes/class) 或  [`id`](/zh-TW/docs/Web/HTML/Reference/Global_attributes/id) 屬性值不是有效的 CSS 識別符，那麼在選擇器中使用它之前，你必須對其進行轉義，可以通過呼叫 {{domxref("CSS.escape_static", "CSS.escape()")}} 或使用[轉義字元](/zh-TW/docs/Web/CSS/ident#轉義字元)中描述的技術之一進行轉義。參見[轉義屬性值](#轉義屬性值)範例。
 
 ### 回傳值
 
-一個 {{domxref("Element")}} 物件，表示文件中第一個符合指定[CSS 選擇器](/zh-TW/docs/Web/CSS/CSS_selectors)的元素；如果沒有匹配項，則回傳 `null`。
+一個 {{domxref("Element")}} 物件，表示文件中第一個符合指定 [CSS 選擇器](/zh-TW/docs/Web/CSS/CSS_selectors)的元素；如果沒有匹配項，則回傳 `null`。
 
 如果你需要符合指定選擇器的所有元素的清單，應該使用 {{domxref("Document.querySelectorAll", "querySelectorAll()")}}。
 
 ### 例外
 
-- `SyntaxError` {{domxref("DOMException")}}
-  - : 當指定的*選擇器*語法無效時拋出。
+- `SyntaxError` {{domxref("DOMException")}} - : 當指定的*選擇器*語法無效時拋出。
 
 ## 範例
 
@@ -74,7 +69,7 @@ const el = document.querySelector(
 
 ### 轉義屬性值
 
-此範例顯示，如果 HTML 文件包含一個不是有效的 [CSS 識別符](/zh-TW/docs/Web/CSS/ident) 的 [`id`](/zh-TW/docs/Web/HTML/Reference/Global_attributes/id)，那麼在 `querySelector()` 中使用它之前，我們必須對屬性值進行轉義。
+此範例顯示，如果 HTML 文件包含一個不是有效的 [CSS 識別符](/zh-TW/docs/Web/CSS/ident)的  [`id`](/zh-TW/docs/Web/HTML/Reference/Global_attributes/id)，那麼在 `querySelector()` 中使用它之前，我們必須對屬性值進行轉義。
 
 #### HTML
 
@@ -159,7 +154,4 @@ document.querySelector("#manual-escape").addEventListener("click", () => {
 
 ## 參見
 
-- [使用選擇器定位 DOM 元素](/zh-TW/docs/Web/API/Document_Object_Model/Locating_DOM_elements_using_selectors)
-- {{domxref("Element.querySelector()")}}
-- {{domxref("Document.querySelectorAll()")}}
-- {{domxref("Element.querySelectorAll()")}}
+- [使用選擇器定位 DOM 元素](/zh-TW/docs/Web/API/Document_Object_Model/Locating_DOM_elements_using_selectors) - {{domxref("Element.querySelector()")}} -  {{domxref("Document.querySelectorAll()")}} - {{domxref("Element.querySelectorAll()")}}
