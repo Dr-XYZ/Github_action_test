@@ -14,7 +14,7 @@
 test 中文是這樣。
 
 
-中文 [English](https://example.com)中文。
+中文 [English](https://example.com) 中文。
 
 ```
     # 程式碼區塊（這些 tab 不應被更改）
