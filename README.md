@@ -7,7 +7,7 @@ l10n:
 
 {{APIRef}}
 
-**`scroll`** 事件會在文件視區被捲動時觸發。若要偵測捲動已完成的時機，參見 `Document` 的 {{domxref("Document/scrollend_event", "scrollend")}} 事件。若是元素的捲動，參見 `Element` 的 {{domxref(“Element/scroll_event”, “scroll”)}} 事件。
+**`scroll`** 事件會在文件視區被捲動時觸發。若要偵測捲動已完成的時機，參見 `Document` 的 {{domxref("Document/scrollend_event", "scrollend")}} 事件。若是元素的捲動，參見 `Element` 的 {{domxref("Element/scroll_event", "scroll")}} 事件。
 
 ## 語法
 
