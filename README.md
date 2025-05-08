@@ -29,7 +29,7 @@ onscroll = (event) => { }
 
 ### 捲動事件的節流
 
-由於 `scroll` 事件可能以高頻率觸發，事件處理器不應執行計算量大的操作，例如 DOM 修改。建議使用 {{glossary("節流")}} 技術，透過 {{DOMxRef("Window.requestAnimationFrame()", "requestAnimationFrame()")}}、{{DOMxRef("Window.setTimeout", "setTimeout()")}} 或 {{DOMxRef("CustomEvent")}} 來優化事件處理，如下所示。
+由於 `scroll` 事件可能以高頻率觸發，事件處理器不應執行計算量大的操作，例如 DOM 修改。建議使用{{glossary("節流")}}技術，透過 {{DOMxRef("Window.requestAnimationFrame()", "requestAnimationFrame()")}}、{{DOMxRef("Window.setTimeout", "setTimeout()")}} 或 {{DOMxRef("CustomEvent")}} 來優化事件處理，如下所示。
 
 然而需要注意的是，輸入事件和動畫幀的觸發頻率大致相同，因此以下的優化通常不是必要的。此範例針對 `requestAnimationFrame` 優化了 `scroll` 事件。
 
