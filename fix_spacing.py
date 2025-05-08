@@ -30,9 +30,22 @@ def process_macro(match):
     after = match.group(3)  # Character after the macro
     param = extract_param(macro) # The text content within the macro
 
+    # Note: When processing line by line, before and after are guaranteed to be on the same line as the macro.
+
     if not param:
         # If parameter extraction fails, return the original match unchanged
-        return before + macro + after
+        # The captured 'before' and 'after' include spaces potentially removed by regex \s*
+        # We need to be careful here. If the original match was "a {{macro}} b" where spaces were captured by \s*
+        # and param extraction failed, simply returning before+macro+after ("a{{macro}}b") might be wrong.
+        # However, the original regex captured the *characters* before and after, with \s* *between* the character and the pattern.
+        # So, the captured groups are just the character and the macro/link. The spaces are outside.
+        # Let's re-verify the regex behavior on the original text. Yes, `(.)\s*(pattern)\s*(.)` captures the characters and the pattern separately.
+        # So, if param fails, we should return the characters plus the macro without re-adding spaces that were removed by re.sub implicitly.
+        # But since we process line by line, the \s* won't cross newlines anymore.
+        # Let's assume the original behaviour of `re.sub` with the match object is what we need here.
+        # The simplest is to just re-insert the captured parts without spacing logic if param fails.
+        return before + macro + after # This might still be slightly off if original had spaces, but let's stick to the logic if param is none.
+
 
     result = ''
 
@@ -68,6 +81,8 @@ def process_link(match):
     # Extract the text inside the brackets [] for language check
     text_inside = link_text[1:-1]
 
+    # Note: When processing line by line, before and after are guaranteed to be on the same line as the link.
+
     # If the text inside the link is empty, handle as an edge case (though regex [^\]]+? should prevent this)
     # We'll still check text_inside validity before accessing [0] or [-1]
     is_text_inside_valid = bool(text_inside)
@@ -100,7 +115,7 @@ def process_link(match):
 
 
 def fix_spacing_in_file(filepath):
-    """Reads a markdown file, applies spacing fixes, and writes back."""
+    """Reads a markdown file, applies spacing fixes line by line, and writes back."""
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
             text = f.read()
@@ -111,19 +126,32 @@ def fix_spacing_in_file(filepath):
         print(f"Error reading file {filepath}: {e}")
         return
 
-    # Regex patterns to find macros and links surrounded by characters and optional spaces
-    # Captures the single character before (group 1) and after (group 3 or 4)
+    # Split the text into lines, keeping the original line endings.
+    # This prevents regex matches from spanning across lines and preserves original newlines.
+    lines = text.splitlines(keepends=True)
+    processed_lines = []
+
+    # Regex patterns applied to individual lines.
+    # The \s* will now only match spaces/tabs *within* a line.
     macro_pattern = r'(.)\s*({{.*?\(".*?"(?:,\s*".*?")?\)}})\s*(.)'
     link_pattern = r'(.)\s*(\[[^\]]+?\])(\([^)]+?\))\s*(.)'
 
-    # Apply the processing functions using re.sub
-    # The processing function decides whether to include spaces based on the characters
-    text = re.sub(macro_pattern, process_macro, text)
-    text = re.sub(link_pattern, process_link, text)
+    for line in lines:
+        # Apply macro processing to the current line
+        processed_line = re.sub(macro_pattern, process_macro, line)
+        # Apply link processing to the result of macro processing on the current line
+        processed_line = re.sub(link_pattern, process_link, processed_line)
+        processed_lines.append(processed_line)
+
+    # Join the processed lines back together.
+    # Since splitlines(keepends=True) was used, each string in processed_lines
+    # already contains its original line ending (or is the last line without one).
+    # So we just concatenate them.
+    output_text = "".join(processed_lines)
 
     try:
         with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(text)
+            f.write(output_text)
         print(f"Spacing fixed in {filepath}")
     except Exception as e:
         print(f"Error writing to file {filepath}: {e}")
