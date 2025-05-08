@@ -23,7 +23,7 @@ l10n:
 _此介面沒有特定的屬性，但繼承自其父介面 {{domxref("Node")}} 的屬性。_
 
 - {{ domxref("DocumentFragment.childElementCount") }} {{ReadOnlyInline}}
-  - : 回傳 `DocumentFragment` 擁有的子 {{domxref("Element", "元素")}} 的數量。
+  - : 回傳 `DocumentFragment` 擁有的子{{domxref("Element", "元素")}}的數量。
 - {{ domxref("DocumentFragment.children") }} {{ReadOnlyInline}}
   - : 回傳一個動態的 {{domxref("HTMLCollection")}}，其中包含 `DocumentFragment` 物件的所有子 {{domxref("Element")}}。
 - {{ domxref("DocumentFragment.firstElementChild") }} {{ReadOnlyInline}}
