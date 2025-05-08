@@ -11,7 +11,7 @@ l10n:
 
 ## 概念與使用方式
 
-可以使用 {{domxref("MessageChannel.MessageChannel", "MessageChannel()")}} 建構子來建立一個訊息通道。一旦建立後，通道的兩個埠可以透過 {{domxref("MessageChannel.port1")}} 和  {{domxref("MessageChannel.port2")}} 屬性存取（這兩者都會回傳 {{domxref("MessagePort")}} 物件）。建立通道的應用程式使用 `port1`，而另一端的應用程式使用 `port2`——你可以向 `port2` 發送訊息，並使用 {{domxref("window.postMessage")}} 傳遞兩個參數（要發送的訊息以及要轉移所有權的物件，在此情況下為埠本身）將埠轉移到另一個瀏覽上下文。
+可以使用{{domxref("MessageChannel.MessageChannel", "MessageChannel()")}} 建構子來建立一個訊息通道。一旦建立後，通道的兩個埠可以透過 {{domxref("MessageChannel.port1")}} 和  {{domxref("MessageChannel.port2")}} 屬性存取（這兩者都會回傳 {{domxref("MessagePort")}} 物件）。建立通道的應用程式使用 `port1`，而另一端的應用程式使用 `port2`——你可以向 `port2` 發送訊息，並使用 {{domxref("window.postMessage")}} 傳遞兩個參數（要發送的訊息以及要轉移所有權的物件，在此情況下為埠本身）將埠轉移到另一個瀏覽上下文。
 
 當這些可轉移物件被轉移後，它們在先前所屬的上下文中將無法再使用。埠在被傳送後，原始上下文將無法再使用該埠。
 
@@ -19,7 +19,7 @@ l10n:
 
 當你想停止透過通道傳送訊息時，可以調用 {{domxref("MessagePort.close")}} 關閉埠。
 
-在[使用通道訊息](/zh-TW/docs/Web/API/Channel_Messaging_API/Using_channel_messaging)中了解更多有關如何使用此 API 的資訊。
+在 abc[使用通道訊息](/zh-TW/docs/Web/API/Channel_Messaging_API/Using_channel_messaging)中了解更多有關如何使用此 API 的資訊。
 
 ## 介面
 
@@ -30,8 +30,8 @@ l10n:
 
 ## 範例
 
-- 我們在 GitHub 上發布了一個[通道訊息基本範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-basic)（[也可以線上運行](https://mdn.github.io/dom-examples/channel-messaging-basic/)），展示了一個頁面與嵌入的 {{htmlelement("iframe")}} 之間進行單一訊息傳遞的簡單範例。
-- 你還可以查看[多訊息範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-multimessage)（[線上運行](https://mdn.github.io/dom-examples/channel-messaging-multimessage/)），展示了一個稍微複雜的設置，可以在主頁面與 IFrame 之間傳送多個訊息。
+- 我們在 GitHub 上發布了一個[chandl 通道訊息基本範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-basic)（[也可以線上運行](https://mdn.github.io/dom-examples/channel-messaging-basic/)），展示了一個頁面與嵌入的 {{htmlelement("iframe")}} 之間進行單一訊息傳遞的簡單範例。
+- 你還可以查看 [多訊息範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-multimessage)（[線上運行](https://mdn.github.io/dom-examples/channel-messaging-multimessage/)），展示了一個稍微複雜的設置，可以在主頁面與 IFrame 之間傳送多個訊息。
 
 ## 規範
 
