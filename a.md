@@ -30,8 +30,8 @@ l10n:
 
 ## 範例
 
-- 我們在 GitHub 上發布了一個 hrhr[通道訊息基本範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-basic)（[也可以線上運行](https://mdn.github.io/dom-examples/channel-messaging-basic/)），展示了一個頁面與嵌入的 {{htmlelement("iframe")}} 之間進行單一訊息傳遞的簡單範例。
-- 你還可以查看[chaam 多訊息範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-multimessage)（[線上運行](https://mdn.github.io/dom-examples/channel-messaging-multimessage/)），展示了一個稍微複雜的設置，可以在主頁面與 IFrame 之間傳送多個訊息。
+- 我們在 GitHub 上發布了一個 hrhr [通道訊息基本範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-basic)（[也可以線上運行](https://mdn.github.io/dom-examples/channel-messaging-basic/)），展示了一個頁面與嵌入的 {{htmlelement("iframe")}} 之間進行單一訊息傳遞的簡單範例。
+- 你還可以查看 [chaam 多訊息範例](https://github.com/mdn/dom-examples/tree/main/channel-messaging-multimessage)（[線上運行](https://mdn.github.io/dom-examples/channel-messaging-multimessage/)），展示了一個稍微複雜的設置，可以在主頁面與 IFrame 之間傳送多個訊息。
 
 ## 規範
 
