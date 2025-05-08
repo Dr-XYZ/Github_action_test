@@ -1,6 +1,6 @@
 ---
 title: Channel Messaging API
-slug: Web/API/Channel_Messaging_API
+slug: Web/API/Channel_Messaging_AP
 l10n:
   sourceCommit: 2c641e08878722bf29fb784d58c61873ce4a133a
 ---
