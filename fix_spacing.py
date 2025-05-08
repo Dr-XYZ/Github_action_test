@@ -1,51 +1,76 @@
 import re
 import sys
-import os
 
-import re
+def is_chinese(char):
+    return '\u4e00' <= char <= '\u9fff'
 
-def fix_spacing(text):
-    # 1. 中文 + [ + 中文（移除空格）
-    text = re.sub(r'([\u4e00-\u9fff])\s+\[([\u4e00-\u9fff])', r'\1[\2', text)
+def extract_param(macro):
+    match = re.match(r'{{.*?\("([^"]+)"(?:,\s*"([^"]*)")?\)}}', macro)
+    if match:
+        p1 = match.group(1)
+        p2 = match.group(2)
+        return p2 if p2 else p1
+    return None
 
-    # 2. 中文 + ](link) + 中文（移除空格）
-    text = re.sub(r'([\u4e00-\u9fff])\s*\]\((.*?)\)\s+([\u4e00-\u9fff])', r'\1](\2)\3', text)
+def process_macro(match):
+    before = match.group(1)
+    macro = match.group(2)
+    after = match.group(3)
+    param = extract_param(macro)
 
-    # 3. 英文 + [ + 中文（補空格）
-    text = re.sub(r'([a-zA-Z0-9])\[(?=[\u4e00-\u9fff])', r'\1 [', text)
+    if not param:
+        return before + macro + after
 
-    # 4. 英文 + ](link) + 中文（補空格）
-    text = re.sub(r'([a-zA-Z0-9])\]\((.*?)\)([\u4e00-\u9fff])', r'\1](\2) \3', text)
+    result = ''
+    if is_chinese(before) and is_chinese(param[0]):
+        result += before + macro
+    else:
+        result += before + ' ' + macro
 
-    # 5. 中文 + [ + 英文（補空格）
-    text = re.sub(r'([\u4e00-\u9fff])\[(?=[a-zA-Z0-9])', r'\1 [', text)
+    if is_chinese(after) and is_chinese(param[-1]):
+        result += after
+    else:
+        result += ' ' + after
 
-    # 6. 中文 + ](link) + 英文（補空格）
-    text = re.sub(r'([\u4e00-\u9fff])\]\((.*?)\)([a-zA-Z0-9])', r'\1](\2) \3', text)
+    return result
 
-    # 7. 移除「中文 + 空格 + 中文」
-    text = re.sub(r'([\u4e00-\u9fff])\s+([\u4e00-\u9fff])', r'\1\2', text)
+def process_link(match):
+    before = match.group(1)
+    link_text = match.group(2)
+    link_url = match.group(3)
+    after = match.group(4)
+    text_inside = link_text[1:-1]
 
-    # 8. 補上「中文 + 英文」之間的空格（若沒有）
-    text = re.sub(r'([\u4e00-\u9fff])(?=[a-zA-Z0-9])', r'\1 ', text)
+    result = ''
+    if is_chinese(before) and is_chinese(text_inside[0]):
+        result += before + link_text + link_url
+    else:
+        result += before + ' ' + link_text + link_url
 
-    # 9. 補上「英文 + 中文」之間的空格（若沒有）
-    text = re.sub(r'([a-zA-Z0-9])(?=[\u4e00-\u9fff])', r'\1 ', text)
+    if is_chinese(after) and is_chinese(text_inside[-1]):
+        result += after
+    else:
+        result += ' ' + after
 
-    # 移除中英之間因補空格而意外重複的空格（只限於中英交界）
-    return text
-def process_markdown_file(file_path):
-    with open(file_path, 'r', encoding='utf-8') as f:
-        content = f.read()
+    return result
 
-    updated = fix_spacing(content)
+def fix_spacing_in_file(filepath):
+    with open(filepath, 'r', encoding='utf-8') as f:
+        text = f.read()
 
-    with open(file_path, 'w', encoding='utf-8') as f:
-        f.write(updated)
+    macro_pattern = r'(.)\s*({{.*?\(".*?"(?:,\s*".*?")?\)}})\s*(.)'
+    link_pattern = r'(.)\s*(\[[^\]]+?\])(\([^)]+?\))\s*(.)'
 
-    print(f"✔ 已處理：{file_path}")
+    text = re.sub(macro_pattern, process_macro, text)
+    text = re.sub(link_pattern, process_link, text)
 
-# 取得命令列參數中傳入的檔案路徑
-if __name__ == "__main__":
-    for file_path in sys.argv[1:]:
-        process_markdown_file(file_path)
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(text)
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print("Usage: python fix_spacing.py <markdown_file>")
+        sys.exit(1)
+
+    filepath = sys.argv[1]
+    fix_spacing_in_file(filepath)
