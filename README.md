@@ -60,7 +60,7 @@ _此介面繼承自其父介面 {{domxref("Node")}} 的方法。_
 
 ## 效能
 
-`DocumentFragment` 的效能優勢通常被誇大。事實上，在某些引擎中，使用 `DocumentFragment` 比在迴圈中直接附加到文件更慢，如[此效能測試](https://jsbench.me/02l63eic9j/1)所示。然而，這些範例之間的差異非常微小，因此優化可讀性比效能更重要。
+`DocumentFragment` 的效能優勢通常被誇大。事實上，在某些引擎中，使用 `DocumentFragment` 比在迴圈中直接附加到文件更慢，如[此效能測試](https://jsbench.me/02l63eic9j/1)所示。然而，這些範例之間的差異非常微小，因此提升可讀性比效能更重要。
 
 ## 範例
 
