@@ -3,7 +3,7 @@ name: Check l10n.sourceCommit
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'  # 每天午夜執行一次，可調整
+    - cron: '0 0 * * *'
 
 jobs:
   check-source-commit:
@@ -14,6 +14,7 @@ jobs:
         with:
           repository: mdn/content
           path: content
+          fetch-depth: 0  # 取得完整 Git 歷史
 
       - name: Checkout mdn/translated-content
         uses: actions/checkout@v4
@@ -36,7 +37,7 @@ jobs:
           touch "$LOG_FILE"
 
           find translated-content/files/zh-tw -name '*.md' | while read -r file; do
-            # 解析 YAML metadata 中的 l10n.sourceCommit
+            # 擷取 YAML metadata
             yaml_metadata=$(awk '/^---$/{y++} y==1' "$file")
             source_commit=$(node -e "
               const yaml = require('js-yaml');
@@ -49,7 +50,7 @@ jobs:
               continue
             fi
 
-            # 推測對應的英文檔案
+            # 對應的英文檔案路徑
             relative_path=${file#translated-content/files/zh-tw}
             en_file="content/files/en-us$relative_path"
 
@@ -58,8 +59,8 @@ jobs:
               continue
             fi
 
-            # 取得該英文檔案的最新提交 SHA
-            latest_sha=$(git -C content log -n 1 --pretty=format:%H -- "$en_file")
+            # 取得英文檔案最新 commit SHA
+            latest_sha=$(git -C content rev-parse HEAD:"files/en-us$relative_path")
 
             if [ "$source_commit" != "$latest_sha" ]; then
               echo "$file -> outdated (source: $source_commit, latest: $latest_sha)" >> "$LOG_FILE"
