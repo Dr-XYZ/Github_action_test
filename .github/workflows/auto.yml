@@ -1,30 +1,36 @@
-name: Prepare for Automated Translation
+name: Automated MDN Translation Workflow
 
 on:
   workflow_dispatch: # 允許手動觸發
   schedule:
-    - cron: '0 0 * * *' # 每天 UTC 時間午夜執行 (可調整為您需要的時區)
+    - cron: '0 16 * * *' # 每天台灣時間午夜 00:00 執行 (UTC 時間 16:00)
 
 jobs:
+  # 第一個 Job：準備待翻譯的檔案
   prepare_files:
     runs-on: ubuntu-latest
+    outputs:
+      continue_translation: ${{ steps.get_commits.outputs.continue_translation }}
+      branch_name: ${{ steps.prepare_for_gemini.outputs.branch_name }} # 將分支名傳遞給下一個 Job
+      has_files_for_translation: ${{ steps.prepare_for_gemini.outputs.has_files_for_translation }} # 是否有檔案需要翻譯
+
     steps:
       - name: Checkout mdn/content
         uses: actions/checkout@v4
         with:
           repository: mdn/content
-          path: mdn-content # 將 mdn/content 儲存庫複製到 mdn-content 目錄
-          fetch-depth: 200 # 設定深度，確保能獲取昨天的所有提交。可以根據實際情況調整。
+          path: mdn-content
+          fetch-depth: 200 # 設定深度，確保能獲取昨天的所有提交。可根據實際情況調整。
 
       - name: Checkout mdn/translated-content
         uses: actions/checkout@v4
         with:
           repository: mdn/translated-content
-          path: mdn-translated-content # 將 mdn/translated-content 儲存庫複製到 mdn-translated-content 目錄
-          token: ${{ secrets.GITHUB_TOKEN }} # 需要讀寫權限來提交變更
-          fetch-depth: 2 # 對於目標儲存庫，只需要足夠的歷史來進行本地操作，通常不需要太深
+          path: mdn-translated-content
+          token: ${{ secrets.GITHUB_TOKEN }} # 需要讀寫權限
+          fetch-depth: 2 # 對於目標儲存庫，只需要足夠的歷史來進行本地操作
 
-      - name: Set up Node.js
+      - name: Set up Node.js (for potential script dependencies)
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -32,14 +38,8 @@ jobs:
       - name: Get yesterday's commits from mdn/content
         id: get_commits
         run: |
-          # 進入 mdn/content 目錄
           cd mdn-content
-
-          # 設定時區為 Asia/Taipei
           export TZ=Asia/Taipei
-
-          # 獲取昨天的提交日誌，並找出最舊和最新的 commit hash
-          # 注意：這裡的 `git log` 會在 fetch-depth 範圍內搜尋
           LOG_OUTPUT=$(git log --after="yesterday 00:00" --before="today 00:00" --pretty=format:'%H')
           
           if [ -z "$LOG_OUTPUT" ]; then
@@ -60,11 +60,7 @@ jobs:
         if: steps.get_commits.outputs.continue_translation == 'true'
         run: |
           cd mdn-content
-          # 獲取變更的檔案列表，只顯示路徑
-          # 確保 NEWEST_COMMIT 和 OLDEST_COMMIT 在 fetch-depth 範圍內
           CHANGED_FILES=$(git log --stat --name-only --pretty="" ${{ env.OLDEST_COMMIT }}^...${{ env.NEWEST_COMMIT }})
-          
-          # 將檔案列表輸出，供後續步驟使用
           echo "$CHANGED_FILES" > ../changed_files.txt
           echo "Changed files listed in changed_files.txt"
 
@@ -72,56 +68,272 @@ jobs:
         id: prepare_for_gemini
         if: steps.get_commits.outputs.continue_translation == 'true'
         run: |
-          mkdir -p mdn-translated-content/files_to_translate
-          echo "files_for_translation=" > $GITHUB_OUTPUT # 初始化輸出變數
+          cd mdn-translated-content # 進入翻譯內容的儲存庫目錄
+          mkdir -p files_to_translate
+          
+          declare -a files_to_process # 宣告一個陣列來儲存要處理的繁體中文檔案路徑
+          HAS_FILES=false # 標誌是否有檔案需要翻譯
+          
+          # 定義一個新的分支名稱
+          BRANCH_NAME="feat/automated-translation-$(date +%Y%m%d%H%M%S)"
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
-          # 遍歷 changed_files.txt 中的每個路徑
+          # 讀取原始英文文件內容，用於構建 Gemini prompt
+          # 將 prompt 內容讀入變數，或作為文件複製到 artifacts
+          cp ../mdn-content/.github/workflows/prompt1.txt files_to_translate/prompt1.txt || true # 確保即使檔案不存在也不會失敗
+          cp ../mdn-content/.github/workflows/prompt2.txt files_to_translate/prompt2.txt || true
+          cp ../mdn-content/.github/workflows/prompt3.txt files_to_translate/prompt3.txt || true
+
+
           while IFS= read -r file_path; do
-            if [[ "$file_path" == files/en-us/*.md ]]; then # 只處理 .md 檔案
-              # 構建對應的繁體中文路徑
+            if [[ "$file_path" == files/en-us/*.md ]]; then
               zh_tw_path=$(echo "$file_path" | sed 's/files\/en-us\//files\/zh-tw\//')
               
-              # 檢查繁體中文檔案是否存在於 mdn/translated-content
-              if [ -f "mdn-translated-content/$zh_tw_path" ]; then
+              if [ -f "$zh_tw_path" ]; then
                 echo "Found existing zh-tw file: $zh_tw_path"
 
-                # 獲取英文檔案的詳細變更內容
-                # 使用 -C 參數指定 git 命令的執行目錄
-                DIFF_CONTENT=$(git -C mdn-content diff ${{ env.OLDEST_COMMIT }}^...${{ env.NEWEST_COMMIT }} -- "$file_path")
+                DIFF_CONTENT=$(git -C ../mdn-content diff ${{ env.OLDEST_COMMIT }}^...${{ env.NEWEST_COMMIT }} -- "$file_path")
                 
-                # 將變更內容保存到一個臨時檔案
-                # 建立對應的目錄結構
                 DIRNAME=$(dirname "$zh_tw_path")
-                mkdir -p "mdn-translated-content/files_to_translate/$DIRNAME"
-                echo "$DIFF_CONTENT" > "mdn-translated-content/files_to_translate/$zh_tw_path.diff"
+                mkdir -p "files_to_translate/$DIRNAME"
+                echo "$DIFF_CONTENT" > "files_to_translate/$zh_tw_path.diff"
                 
-                # 將原始英文路徑加入列表
-                echo "$file_path" >> mdn-translated-content/files_to_translate/translation_list.txt
+                echo "$original_en_path" >> files_to_translate/translation_list.txt
+                echo "$file_path" >> files_to_translate/original_en_paths.txt # 新增一個檔案紀錄原始英文路徑
 
-                # 將需要翻譯的繁體中文檔案路徑加入輸出列表
-                # 為了避免過長的輸出變數，這裡只記錄到 translation_list.txt 即可
-                # 或者可以將路徑編碼為 JSON 陣列
-                echo "files_for_translation=$(echo "${{ steps.prepare_for_gemini.outputs.files_for_translation }}${zh_tw_path}|" | tr -d '\n')" >> $GITHUB_OUTPUT
-
+                files_to_process+=("$zh_tw_path") # 將繁體中文檔案路徑加入陣列
+                HAS_FILES=true
               else
                 echo "zh-tw file not found for: $file_path - Skipping."
               fi
             fi
-          done < changed_files.txt
+          done < ../changed_files.txt
+
+          if [ "$HAS_FILES" = true ]; then
+              echo "has_files_for_translation=true" >> $GITHUB_OUTPUT
+              echo "Files prepared for translation. Branch name: $BRANCH_NAME"
+          else
+              echo "has_files_for_translation=false" >> $GITHUB_OUTPUT
+              echo "No files found for translation."
+          fi
 
       - name: Upload files to translate artifact
-        # 只有在有檔案需要翻譯時才上傳 Artifact
-        if: steps.get_commits.outputs.continue_translation == 'true' && steps.prepare_for_gemini.outputs.files_for_translation != ''
+        if: steps.prepare_for_gemini.outputs.has_files_for_translation == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: files-to-translate
           path: mdn-translated-content/files_to_translate/
-          retention-days: 1 # 儲存一天，用於後續步驟
+          retention-days: 1
 
-      - name: Proceed to translation job
-        if: steps.get_commits.outputs.continue_translation == 'true' && steps.prepare_for_gemini.outputs.files_for_translation != ''
+  # 第二個 Job：執行翻譯和提交
+  translate_and_commit:
+    needs: prepare_files # 依賴 prepare_files Job
+    if: needs.prepare_files.outputs.has_files_for_translation == 'true' # 只有當有檔案需要翻譯時才執行
+    runs-on: ubuntu-latest
+    environment: production # 定義環境，可以設定環境變數或保護分支
+
+    steps:
+      - name: Checkout mdn/translated-content (for modifications)
+        uses: actions/checkout@v4
+        with:
+          repository: mdn/translated-content
+          path: mdn-translated-content
+          token: ${{ secrets.GITHUB_TOKEN }} # 需要讀寫權限
+          fetch-depth: 2 # 確保有足夠的歷史來提交和創建PR
+
+      - name: Checkout mdn/content (for full English content reference)
+        uses: actions/checkout@v4
+        with:
+          repository: mdn/content
+          path: mdn-content
+          fetch-depth: 100 # 需要足夠的歷史來拉取原文，或根據需要調整
+
+      - name: Download files to translate artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: files-to-translate
+          path: mdn-translated-content/files_to_translate/
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' # 確保 Python 版本兼容
+
+      - name: Install Python dependencies
         run: |
-          echo "Ready for translation. Files prepared in artifact 'files-to-translate'."
-          # 您可以在這裡觸發下一個處理 Gemini 翻譯的 GitHub Action
-          # 例如，使用 repository_dispatch 觸發另一個工作流程
-          # 或者，如果這是同一個 workflow，則讓下一個 job 依賴於此 job
+          pip install google-generativeai
+
+      - name: Configure Git for committing
+        run: |
+          git config --global user.name "MDN Translation Bot"
+          git config --global user.email "mdn-bot@example.com" # 使用您的機器人郵箱
+
+      - name: Create and checkout translation branch
+        run: |
+          cd mdn-translated-content
+          git checkout -b ${{ needs.prepare_files.outputs.branch_name }}
+
+      - name: Process and translate files with Gemini API
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # 從 GitHub Secrets 獲取 API Key
+        run: |
+          cd mdn-translated-content
+
+          # 讀取 prompt 檔案內容
+          PROMPT1=$(cat files_to_translate/prompt1.txt)
+          PROMPT2=$(cat files_to_translate/prompt2.txt)
+          PROMPT3=$(cat files_to_translate/prompt3.txt)
+
+          # 執行翻譯腳本
+          while IFS= read -r original_en_path; do
+            echo "Processing $original_en_path..."
+            
+            # 構建對應的繁體中文路徑和 diff 檔案路徑
+            zh_tw_path=$(echo "$original_en_path" | sed 's/files\/en-us\//files\/zh-tw\//')
+            DIFF_FILE="files_to_translate/$zh_tw_path.diff"
+            
+            if [ ! -f "$DIFF_FILE" ]; then
+              echo "Error: Diff file $DIFF_FILE not found. Skipping."
+              continue
+            fi
+
+            # 讀取原始英文文件內容 (從 mdn-content 儲存庫獲取)
+            ORIGINAL_EN_CONTENT=$(cat ../mdn-content/"$original_en_path")
+            
+            # 讀取 git diff 內容
+            GIT_DIFF_CONTENT=$(cat "$DIFF_FILE")
+
+            # 讀取現有的中文文件內容
+            EXISTING_ZH_TW_CONTENT=""
+            if [ -f "$zh_tw_path" ]; then
+                EXISTING_ZH_TW_CONTENT=$(cat "$zh_tw_path")
+            fi
+
+            # 執行 Python 翻譯腳本
+            # 我們將所有必要的資訊作為參數傳遞給 Python 腳本
+            python3 -c "
+import os
+import argparse
+from google.generativeai import GenerativeModel, configure
+
+def setup_gemini_model(api_key):
+    configure(api_key=api_key)
+    return GenerativeModel('gemini-pro')
+
+def translate_content(model, prompt_parts, temperature=0):
+    full_prompt = ''.join(prompt_parts)
+    try:
+        response = model.generate_content(
+            full_prompt,
+            generation_config={'temperature': temperature}
+        )
+        return response.text
+    except Exception as e:
+        print(f'Error calling Gemini API: {e}', flush=True) # 使用 flush=True 確保立即輸出
+        return None
+
+def main():
+    parser = argparse.ArgumentParser(description='Automated translation using Gemini API.')
+    parser.add_argument('--api_key', required=True)
+    parser.add_argument('--original_en_content', required=True)
+    parser.add_argument('--existing_zh_tw_content', default='')
+    parser.add_argument('--git_diff_content', required=True)
+    parser.add_argument('--output_path', required=True)
+    parser.add_argument('--prompt1', required=True)
+    parser.add_argument('--prompt2', required=True)
+    parser.add_argument('--prompt3', required=True)
+    
+    args = parser.parse_args()
+
+    model = setup_gemini_model(args.api_key)
+
+    prompt_parts = [
+        args.prompt1,
+        '\n\n原始中文文件內容:\n```\n',
+        args.existing_zh_tw_content,
+        '\n```\n\n',
+        args.prompt2,
+        '\n\n英文 git diff 內容:\n```diff\n',
+        args.git_diff_content,
+        '\n```\n\n',
+        args.prompt3
+    ]
+
+    translated_content = translate_content(model, prompt_parts, temperature=0)
+
+    if translated_content:
+        # 確保目標目錄存在
+        os.makedirs(os.path.dirname(args.output_path), exist_ok=True)
+        with open(args.output_path, 'w', encoding='utf-8') as f:
+            f.write(translated_content)
+        print(f'Successfully translated and wrote to {args.output_path}', flush=True)
+    else:
+        print(f'Translation failed for {args.output_path}', flush=True)
+
+if __name__ == '__main__':
+    main()
+" --api_key "$GEMINI_API_KEY" \
+   --original_en_content "$ORIGINAL_EN_CONTENT" \
+   --existing_zh_tw_content "$EXISTING_ZH_TW_CONTENT" \
+   --git_diff_content "$GIT_DIFF_CONTENT" \
+   --output_path "$zh_tw_path" \
+   --prompt1 "$PROMPT1" --prompt2 "$PROMPT2" --prompt3 "$PROMPT3"
+
+            # 添加翻譯後的檔案到 Git 暫存區
+            git add "$zh_tw_path"
+
+          done < files_to_translate/original_en_paths.txt # 從這個檔案讀取原始英文路徑
+
+          # 提交所有翻譯後的變更
+          if ! git diff --cached --quiet; then
+            git commit -m "feat(i18n): Automated translation update from mdn/content
+            
+            由 Gemini API 自動翻譯，請人工審核。
+            
+            原始英文提交資訊：
+            $(git -C ../mdn-content log --pretty=format:'%h %s' --after="yesterday 00:00" --before="today 00:00")
+            "
+            echo "Successfully committed translation changes."
+          else
+            echo "No changes to commit. All files were already translated or skipped."
+          fi
+
+          # 推送新分支到您的 fork
+          echo "Pushing branch ${{ needs.prepare_files.outputs.branch_name }} to remote..."
+          git push origin ${{ needs.prepare_files.outputs.branch_name }}
+
+      - name: Create Pull Request
+        if: success() && steps.prepare_files.outputs.has_files_for_translation == 'true' # 只有在有翻譯並成功時才創建 PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const branchName = '${{ needs.prepare_files.outputs.branch_name }}';
+            const forkOwner = '${{ github.repository_owner }}'; // 執行 workflow 的儲存庫擁有者
+            const targetRepoOwner = 'mdn'; // 目標儲存庫的擁有者
+            const targetRepoName = 'translated-content'; // 目標儲存庫的名稱
+
+            console.log(`Attempting to create PR from ${forkOwner}/${targetRepoName}:${branchName} to ${targetRepoOwner}/${targetRepoName}:main`);
+
+            try {
+              const response = await github.rest.pulls.create({
+                owner: targetRepoOwner,
+                repo: targetRepoName,
+                title: `feat(i18n): Automated zh-tw translation update (${new Date().toLocaleDateString('zh-TW')})`,
+                head: `${forkOwner}:${branchName}`,
+                base: 'main',
+                body: `此 PR 包含由 Gemini API 自動翻譯的內容更新。
+
+請仔細審閱所有變更以確保翻譯的準確性和一致性。
+`,
+                draft: true // 設為草稿，等待人工審核
+              });
+              console.log('Pull Request created:', response.data.html_url);
+            } catch (error) {
+              console.error('Error creating Pull Request:', error.message);
+              if (error.status === 422 && error.message.includes('A pull request already exists')) {
+                console.log('A pull request already exists for this branch. Skipping PR creation.');
+              } else {
+                throw error;
+              }
+            }
