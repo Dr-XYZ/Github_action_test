@@ -1,0 +1,119 @@
+name: Prepare for Automated Translation
+
+on:
+  workflow_dispatch: # 允許手動觸發
+  schedule:
+    - cron: '0 0 * * *' # 每天 UTC 時間午夜執行 (可調整為您需要的時區)
+
+jobs:
+  prepare_files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout mdn/content
+        uses: actions/checkout@v4
+        with:
+          repository: mdn/content
+          path: mdn-content # 將 mdn/content 儲存庫複製到 mdn-content 目錄
+
+      - name: Checkout mdn/translated-content
+        uses: actions/checkout@v4
+        with:
+          repository: mdn/translated-content
+          path: mdn-translated-content # 將 mdn/translated-content 儲存庫複製到 mdn-translated-content 目錄
+          token: ${{ secrets.GITHUB_TOKEN }} # 需要讀寫權限來提交變更
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Get yesterday's commits from mdn/content
+        id: get_commits
+        run: |
+          # 進入 mdn/content 目錄
+          cd mdn-content
+
+          # 設定時區為 Asia/Taipei
+          export TZ=Asia/Taipei
+
+          # 獲取昨天的提交日誌，並找出最舊和最新的 commit hash
+          LOG_OUTPUT=$(git log --after="yesterday 00:00" --before="today 00:00" --pretty=format:'%H')
+          
+          if [ -z "$LOG_OUTPUT" ]; then
+            echo "No commits found for yesterday. Skipping translation."
+            echo "continue_translation=false" >> $GITHUB_OUTPUT
+          else
+            OLDEST_COMMIT=$(echo "$LOG_OUTPUT" | tail -n 1)
+            NEWEST_COMMIT=$(echo "$LOG_OUTPUT" | head -n 1)
+            
+            echo "Found commits from $OLDEST_COMMIT to $NEWEST_COMMIT"
+            echo "OLDEST_COMMIT=$OLDEST_COMMIT" >> $GITHUB_ENV
+            echo "NEWEST_COMMIT=$NEWEST_COMMIT" >> $GITHUB_ENV
+            echo "continue_translation=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get changed file paths
+        id: get_changed_files
+        if: steps.get_commits.outputs.continue_translation == 'true'
+        run: |
+          cd mdn-content
+          # 獲取變更的檔案列表，只顯示路徑
+          CHANGED_FILES=$(git log --stat --name-only --pretty="" ${{ env.OLDEST_COMMIT }}^...${{ env.NEWEST_COMMIT }})
+          
+          # 將檔案列表輸出，供後續步驟使用
+          echo "$CHANGED_FILES" > ../changed_files.txt
+          echo "Changed files listed in changed_files.txt"
+
+      - name: Identify files for translation and prepare diffs
+        id: prepare_for_gemini
+        if: steps.get_commits.outputs.continue_translation == 'true'
+        run: |
+          mkdir -p mdn-translated-content/files_to_translate
+          echo "files_for_translation=" > $GITHUB_OUTPUT # 初始化輸出變數
+
+          while IFS= read -r file_path; do
+            if [[ "$file_path" == files/en-us/*.md ]]; then # 只處理 .md 檔案
+              # 構建對應的繁體中文路徑
+              zh_tw_path=$(echo "$file_path" | sed 's/files\/en-us\//files\/zh-tw\//')
+              
+              # 檢查繁體中文檔案是否存在於 mdn/translated-content
+              if [ -f "mdn-translated-content/$zh_tw_path" ]; then
+                echo "Found existing zh-tw file: $zh_tw_path"
+
+                # 獲取英文檔案的詳細變更內容
+                # 注意：這裡的 diff 是基於 mdn-content 儲存庫的，
+                # 我們需要確保能夠正確地提取出需要翻譯的英文原文內容
+                DIFF_CONTENT=$(git -C mdn-content diff ${{ env.OLDEST_COMMIT }}^...${{ env.NEWEST_COMMIT }} -- "$file_path")
+                
+                # 將變更內容保存到一個臨時檔案，以便傳遞給 Gemini API
+                # 可以根據需要調整儲存格式，例如 JSON 包含原文和變更
+                FILENAME=$(basename "$file_path")
+                DIRNAME=$(dirname "$file_path")
+                # 建立對應的目錄結構
+                mkdir -p mdn-translated-content/files_to_translate/$DIRNAME
+                echo "$DIFF_CONTENT" > mdn-translated-content/files_to_translate/$zh_tw_path.diff
+                echo "$file_path" >> mdn-translated-content/files_to_translate/translation_list.txt
+
+                # 將需要翻譯的繁體中文檔案路徑加入輸出列表
+                echo "files_for_translation=$(echo "${{ steps.prepare_for_gemini.outputs.files_for_translation }}")$zh_tw_path," >> $GITHUB_OUTPUT
+              else
+                echo "zh-tw file not found for: $file_path - Skipping."
+              fi
+            fi
+          done < changed_files.txt
+
+      - name: Upload files to translate artifact
+        if: steps.get_commits.outputs.continue_translation == 'true' && steps.prepare_for_gemini.outputs.files_for_translation != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: files-to-translate
+          path: mdn-translated-content/files_to_translate/
+          retention-days: 1 # 儲存一天，用於後續步驟
+
+      - name: Proceed to translation job
+        if: steps.get_commits.outputs.continue_translation == 'true' && steps.prepare_for_gemini.outputs.files_for_translation != ''
+        run: |
+          echo "Ready for translation. Files prepared in artifact 'files-to-translate'."
+          # 您可以在這裡觸發下一個處理 Gemini 翻譯的 GitHub Action
+          # 例如，使用 repository_dispatch 觸發另一個工作流程
+          # 或者，如果這是同一個 workflow，則讓下一個 job 依賴於此 job
