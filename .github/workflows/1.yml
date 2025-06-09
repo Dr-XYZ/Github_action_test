@@ -14,7 +14,7 @@ jobs:
         with:
           repository: mdn/content
           path: content
-          fetch-depth: 0  # 取得完整 Git 歷史
+          fetch-depth: 0
 
       - name: Checkout mdn/translated-content
         uses: actions/checkout@v4
@@ -30,11 +30,10 @@ jobs:
       - name: Install js-yaml
         run: npm install js-yaml
 
-      - name: Compare l10n.sourceCommit with content repo
+      - name: Compare l10n.sourceCommit with latest commit in content
         run: |
           LOG_FILE="log.txt"
-          rm -f "$LOG_FILE"
-          touch "$LOG_FILE"
+          > "$LOG_FILE"
 
           find translated-content/files/zh-tw -name '*.md' | while read -r file; do
             # 擷取 YAML metadata
@@ -45,26 +44,25 @@ jobs:
               console.log(meta?.l10n?.sourceCommit || '');
             ")
 
-            if [ -z "$source_commit" ]; then
-              echo "No sourceCommit in $file, skipping."
-              continue
-            fi
+            [ -z "$source_commit" ] && continue
 
-            # 對應的英文檔案路徑
+            # 對應英文檔案路徑
             relative_path=${file#translated-content/files/zh-tw}
-            en_file="content/files/en-us$relative_path"
+            en_path="files/en-us$relative_path"
+            en_file="content/$en_path"
 
-            if [ ! -f "$en_file" ]; then
-              echo "English file not found for $file"
-              continue
-            fi
+            [ ! -f "$en_file" ] && continue
 
-            # 取得英文檔案最新 commit SHA
-            latest_sha=$(git -C content rev-parse HEAD:"files/en-us$relative_path")
+            # 最新 commit SHA
+            latest_commit=$(git -C content log -n 1 --format=%H -- "$en_path")
 
-            if [ "$source_commit" != "$latest_sha" ]; then
-              echo "$file -> outdated (source: $source_commit, latest: $latest_sha)" >> "$LOG_FILE"
-            fi
+            # 若相同則略過
+            [ "$source_commit" = "$latest_commit" ] && continue
+
+            # 計算距離：source_commit → latest_commit 的 commit 數
+            distance=$(git -C content rev-list --count "$source_commit..$latest_commit" -- "$en_path")
+
+            echo "$file, $distance, $source_commit, $latest_commit" >> "$LOG_FILE"
           done
 
       - name: Upload log artifact
