@@ -1,0 +1,73 @@
+name: Check l10n.sourceCommit
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # 每天午夜執行一次，可調整
+
+jobs:
+  check-source-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout mdn/content
+        uses: actions/checkout@v4
+        with:
+          repository: mdn/content
+          path: content
+
+      - name: Checkout mdn/translated-content
+        uses: actions/checkout@v4
+        with:
+          repository: mdn/translated-content
+          path: translated-content
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install js-yaml
+        run: npm install js-yaml
+
+      - name: Compare l10n.sourceCommit with content repo
+        run: |
+          LOG_FILE="log.txt"
+          rm -f "$LOG_FILE"
+          touch "$LOG_FILE"
+
+          find translated-content/files/zh-tw -name '*.md' | while read -r file; do
+            # 解析 YAML metadata 中的 l10n.sourceCommit
+            yaml_metadata=$(awk '/^---$/{y++} y==1' "$file")
+            source_commit=$(node -e "
+              const yaml = require('js-yaml');
+              const meta = yaml.load(\`${yaml_metadata}\`);
+              console.log(meta?.l10n?.sourceCommit || '');
+            ")
+
+            if [ -z "$source_commit" ]; then
+              echo "No sourceCommit in $file, skipping."
+              continue
+            fi
+
+            # 推測對應的英文檔案
+            relative_path=${file#translated-content/files/zh-tw}
+            en_file="content/files/en-us$relative_path"
+
+            if [ ! -f "$en_file" ]; then
+              echo "English file not found for $file"
+              continue
+            fi
+
+            # 取得該英文檔案的最新提交 SHA
+            latest_sha=$(git -C content log -n 1 --pretty=format:%H -- "$en_file")
+
+            if [ "$source_commit" != "$latest_sha" ]; then
+              echo "$file -> outdated (source: $source_commit, latest: $latest_sha)" >> "$LOG_FILE"
+            fi
+          done
+
+      - name: Upload log artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: outdated-files-log
+          path: log.txt
