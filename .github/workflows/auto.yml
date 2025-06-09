@@ -14,6 +14,7 @@ jobs:
         with:
           repository: mdn/content
           path: mdn-content # 將 mdn/content 儲存庫複製到 mdn-content 目錄
+          fetch-depth: 200 # 設定深度，確保能獲取昨天的所有提交。可以根據實際情況調整。
 
       - name: Checkout mdn/translated-content
         uses: actions/checkout@v4
@@ -21,6 +22,7 @@ jobs:
           repository: mdn/translated-content
           path: mdn-translated-content # 將 mdn/translated-content 儲存庫複製到 mdn-translated-content 目錄
           token: ${{ secrets.GITHUB_TOKEN }} # 需要讀寫權限來提交變更
+          fetch-depth: 2 # 對於目標儲存庫，只需要足夠的歷史來進行本地操作，通常不需要太深
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -37,6 +39,7 @@ jobs:
           export TZ=Asia/Taipei
 
           # 獲取昨天的提交日誌，並找出最舊和最新的 commit hash
+          # 注意：這裡的 `git log` 會在 fetch-depth 範圍內搜尋
           LOG_OUTPUT=$(git log --after="yesterday 00:00" --before="today 00:00" --pretty=format:'%H')
           
           if [ -z "$LOG_OUTPUT" ]; then
@@ -58,6 +61,7 @@ jobs:
         run: |
           cd mdn-content
           # 獲取變更的檔案列表，只顯示路徑
+          # 確保 NEWEST_COMMIT 和 OLDEST_COMMIT 在 fetch-depth 範圍內
           CHANGED_FILES=$(git log --stat --name-only --pretty="" ${{ env.OLDEST_COMMIT }}^...${{ env.NEWEST_COMMIT }})
           
           # 將檔案列表輸出，供後續步驟使用
@@ -71,6 +75,7 @@ jobs:
           mkdir -p mdn-translated-content/files_to_translate
           echo "files_for_translation=" > $GITHUB_OUTPUT # 初始化輸出變數
 
+          # 遍歷 changed_files.txt 中的每個路徑
           while IFS= read -r file_path; do
             if [[ "$file_path" == files/en-us/*.md ]]; then # 只處理 .md 檔案
               # 構建對應的繁體中文路徑
@@ -81,21 +86,23 @@ jobs:
                 echo "Found existing zh-tw file: $zh_tw_path"
 
                 # 獲取英文檔案的詳細變更內容
-                # 注意：這裡的 diff 是基於 mdn-content 儲存庫的，
-                # 我們需要確保能夠正確地提取出需要翻譯的英文原文內容
+                # 使用 -C 參數指定 git 命令的執行目錄
                 DIFF_CONTENT=$(git -C mdn-content diff ${{ env.OLDEST_COMMIT }}^...${{ env.NEWEST_COMMIT }} -- "$file_path")
                 
-                # 將變更內容保存到一個臨時檔案，以便傳遞給 Gemini API
-                # 可以根據需要調整儲存格式，例如 JSON 包含原文和變更
-                FILENAME=$(basename "$file_path")
-                DIRNAME=$(dirname "$file_path")
+                # 將變更內容保存到一個臨時檔案
                 # 建立對應的目錄結構
-                mkdir -p mdn-translated-content/files_to_translate/$DIRNAME
-                echo "$DIFF_CONTENT" > mdn-translated-content/files_to_translate/$zh_tw_path.diff
+                DIRNAME=$(dirname "$zh_tw_path")
+                mkdir -p "mdn-translated-content/files_to_translate/$DIRNAME"
+                echo "$DIFF_CONTENT" > "mdn-translated-content/files_to_translate/$zh_tw_path.diff"
+                
+                # 將原始英文路徑加入列表
                 echo "$file_path" >> mdn-translated-content/files_to_translate/translation_list.txt
 
                 # 將需要翻譯的繁體中文檔案路徑加入輸出列表
-                echo "files_for_translation=$(echo "${{ steps.prepare_for_gemini.outputs.files_for_translation }}")$zh_tw_path," >> $GITHUB_OUTPUT
+                # 為了避免過長的輸出變數，這裡只記錄到 translation_list.txt 即可
+                # 或者可以將路徑編碼為 JSON 陣列
+                echo "files_for_translation=$(echo "${{ steps.prepare_for_gemini.outputs.files_for_translation }}${zh_tw_path}|" | tr -d '\n')" >> $GITHUB_OUTPUT
+
               else
                 echo "zh-tw file not found for: $file_path - Skipping."
               fi
@@ -103,6 +110,7 @@ jobs:
           done < changed_files.txt
 
       - name: Upload files to translate artifact
+        # 只有在有檔案需要翻譯時才上傳 Artifact
         if: steps.get_commits.outputs.continue_translation == 'true' && steps.prepare_for_gemini.outputs.files_for_translation != ''
         uses: actions/upload-artifact@v4
         with:
